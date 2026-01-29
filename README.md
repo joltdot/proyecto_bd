@@ -1,4 +1,13 @@
 # Proyecto Bases de Datos
+
+# Integrantes del equipo:
+## Dominique Ontiveros Arriaga
+## Fernando  Daniel Gutiérrez Mártinez
+## Juan Pablo Montiel Cervantes
+## Ben Zimbrón Pérez
+## Alexis Cuevas Heras 
+
+
 ### __Entrega 1:__ Introducción al conjunto de datos y al problema a estudiar considerando aspectos éticos del conjunto de datos empleado
 #### __TODO__ | Seleccionar un set de datos
 El equipo debe seleccionar una fuente de datos de su preferencia para la ejecución del
