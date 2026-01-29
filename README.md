@@ -1,11 +1,7 @@
 # Proyecto Bases de Datos
 
 ## Integrantes del equipo:
-### Dominique Ontiveros Arriaga
-### Fernando  Daniel Gutiérrez Mártinez
-### Juan Pablo Montiel Cervantes
-### Ben Zimbrón Pérez
-### Alexis Cuevas Heras 
+### Dominique Ontiveros Arriaga, Fernando  Daniel Gutiérrez Mártinez, Juan Pablo Montiel Cervantes, Ben Zimbrón Pérez, Alexis Cuevas Heras 
 
 
 ### __Entrega 1:__ Introducción al conjunto de datos y al problema a estudiar considerando aspectos éticos del conjunto de datos empleado
