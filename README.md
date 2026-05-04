@@ -1,155 +1,178 @@
-# Introducción al Conjunto de Datos: Accidentes de Tránsito CDMX
-### Alexis Cuevas, Ben Zimbron, Dominique Ontiveros, Fernando Gutierrez, Juan Pablo Montiel
+# Proyecto BD: Accidentes de Tránsito en la CDMX
+
+## Integrantes
+
+- Alexis Cuevas — CU: XXXXXX — GitHub: LINK  
+- Ben Zimbron — CU: XXXXXX — GitHub: LINK  
+- Dominique Ontiveros — CU: XXXXXX — GitHub: LINK  
+- Fernando Gutiérrez — CU:  216761 — GitHub: https://github.com/ferdgm
+- Juan Pablo Montiel — CU: XXXXXX — GitHub: LINK  
+
 ---
-Este conjunto de datos contiene información detallada sobre incidentes viales ocurridos en la Ciudad de México, incluyendo ubicación geográfica, características del siniestro, vehículos involucrados, víctimas y condiciones del entorno. Los datos permiten analizar patrones de accidentalidad urbana para mejorar políticas de seguridad vial. Estos son recolectados por la Secretaría de Seguridad Ciudadana (SSC) de la Ciudad de México en colaboración con el C5 (Centro de Comando, Control, Cómputo, Comunicaciones y Contacto Ciudadano) a través de reportes de emergencia y trabajo policial. Esta información se publica en el Portal de Datos Abiertos de la CDMX (https://datos.cdmx.gob.mx/dataset/hechos-de-transito-reportados-por-ssc-base-ampliada-no-comparativa) con actualizaciones mensuales que pararon en marzo de 2024. El objetivo principal es generar transparencia gubernamental y proporcionar información estadística para:
 
->- Políticas públicas de prevención vial
->- Asignación de recursos de emergencia
->- Estudios académicos sobre movilidad urbana
->- Auditoría ciudadana sobre seguridad pública
-----
-El conjunto de datos contiene 215,079 registros anuales con 26 atributos que describen cada incidente, cada uno de los cuales ayuda a analizar cada siniestro individualmente así como ver la relación entre cada registro.
+## Introducción
 
-### Atributos Numéricos:
->- folio
->- latitud
->- longitud
+Este proyecto utiliza un conjunto de datos que contiene información detallada sobre incidentes de tránsito ocurridos en la Ciudad de México. Cada registro describe un siniestro vial e incluye información sobre su ubicación geográfica, características del evento, condiciones del entorno, vehículos involucrados y consecuencias humanas.
 
-### Atributos Categóricos:
->- zona_vial
->- tipo_evento
->- tipo_de_interseccion
->- interseccion_semaforizada
->- clasificacion_de_la_vialidad
->- sentido_de_circulacion
->- dia
->- prioridad
->- origen (cómo se reportó el incidente)
->- trasladado_lesionados
->- no_vehiculo (dice si es el vehículo implicado #1 o #2)
->- tipo_vehiculo
+El análisis de estos datos permite identificar patrones de accidentalidad urbana y contribuir al diseño de estrategias para mejorar la seguridad vial en la ciudad.
 
-### Atributos de Texto:
->- colonia
->- alcaldia
->- sector
->- unidad_a_cargo
->- unidad_medica_de_apoyo
->- matricula_unidad_medica
->- punto_1 (calle de cruce 1)
->- punto_2 (calle de cruce 2)
-### Atributos Temporales/Fecha:
->- fecha_evento
->- hora_evento
->- fecha_captura
+En particular, este proyecto busca:
 
+- Identificar puntos críticos con alta incidencia de accidentes  
+- Analizar patrones temporales (horas y días con mayor frecuencia)  
+- Detectar factores de riesgo predominantes por alcaldía  
 
-Utilizaremos este dataset para identificar zonas de alto riesgo vial en la CDMX mediante análisis geoespacial y temporal. Específicamente buscaremos:
->- Puntos críticos (calles/intersecciones con mayor incidencia)
->- Patrones horarios (horas pico de accidentalidad)
->- Factores de riesgo predominantes por alcaldía
+Estos resultados pueden apoyar la toma de decisiones en:
 
-Y así poder informar toma de decisiones sobre:
+- Planeación de infraestructura vial  
+- Asignación de recursos de emergencia  
+- Diseño de campañas de concientización  
 
->- Colocación de semáforos o reductores de velocidad
->- Horarios de vigilancia policial
->- Campañas de concientización dirigidas
+### Consideraciones éticas
 
-Aunque estos datos son muy valiosos, es importante considerar algunas implicaciones éticas como la privacidad de los involucrados (pues, aunque no hay detalles de los individuos, los registros individuales podrían permitir su identificación indirecta), la posible estigmatización de zonas por tener mayores siniestros e incluso el uso por aseguradoras para no cubrir todos los gastos de un accidente en ciertas zonas.
+El uso de este conjunto de datos implica ciertas consideraciones éticas. Aunque no contiene información personal directa, existe el riesgo de identificación indirecta en casos específicos. Además, el análisis podría contribuir a la estigmatización de ciertas zonas con alta incidencia de accidentes o ser utilizado por terceros (por ejemplo, aseguradoras) para tomar decisiones que afecten a la población.
 
+Por ello, es importante interpretar los resultados con responsabilidad y dentro de un contexto adecuado.
+
+---
+
+## Fuente de datos
+
+Los datos utilizados en este proyecto provienen del Portal de Datos Abiertos de la Ciudad de México y son generados por la Secretaría de Seguridad Ciudadana (SSC) en colaboración con el C5 (Centro de Comando, Control, Cómputo, Comunicaciones y Contacto Ciudadano).
+
+Estos datos se recolectan a partir de reportes de emergencia y registros policiales, y se publican con fines de transparencia y análisis estadístico.
+
+Se pueden consultar en el siguiente enlace:
+
+https://datos.cdmx.gob.mx/dataset/hechos-de-transito-reportados-por-ssc-base-ampliada-no-comparativa
+
+Las instrucciones de replicación del proyecto asumen que los datos se encuentran almacenados en formato `CSV` bajo el nombre: `./data/raw_data.csv`
+
+---
+
+## Descripción del conjunto de datos
+
+El conjunto de datos contiene aproximadamente 134,079 registros anuales, con 26 atributos que describen cada incidente.
+
+### Atributos numéricos
+
+- latitud  
+- longitud  
+- personas_fallecidas  
+- personas_lesionadas  
+
+### Atributos categóricos
+
+- zona_vial  
+- tipo_evento  
+- tipo_de_interseccion  
+- interseccion_semaforizada  
+- clasificacion_de_la_vialidad  
+- sentido_de_circulacion  
+- dia  
+- prioridad  
+- origen  
+- trasladado_lesionados  
+- tipo_vehiculo  
+
+### Atributos de texto
+
+- folio  
+- colonia  
+- alcaldia  
+- sector  
+- unidad_a_cargo  
+- unidad_medica_de_apoyo  
+- matricula_unidad_medica  
+- punto_1  
+- punto_2  
+
+### Atributos temporales
+
+- fecha_evento  
+- hora_evento  
+- fecha_captura 
+
+## Documentación
+---
 ### Estructura del repositorio
+El proyecto sigue una estructura modular para facilitar la reproducibilidad del pipeline de datos:}
 
 ```
-├── README.md                                         <- Documentación para desarrolladores 
-├── datos
+├── README.md                                         <- Documentación para desarrolladores de este proyecto (i.e., reporte escrito)
+├── data
 │   ├── .gitignore
-│   └── nuevo_acumulado_hechos_de_transito_2023_12.csv          <- Datos en formato CSV (originales)
+│   └── raw_data.csv                                  <- Datos en formato CSV como vienen de la fuente original
 │
-├── pipeline_scripts                                  <- Ejecución del pipeline de datos
-│   ├── nuevo_acumulado_hechos_de_transito_2023_12.sql     <- Carga inicial (i.e., actividad B)
-│   ├── 02_data_cleaning.sql                          <- Limpieza de datos (i.e., actividad C)
+├── pipeline_scripts                                  <- Scripts de SQL para ejecución del pipeline de datos
+│   ├── 01_raw_data_schema_creation_and_load.sql      <- Script de carga inicial (i.e., actividad B)
+│   ├── 02_data_cleaning.sql                          <- Script de limpieza de datos (i.e., actividad C)
+│   ├── 03_data_normalization.sql                     <- Script de normalización de relaciones (i.e., actividad D)
+│   └── 04_analytical_attributes_creation.sql         <- Script de creación de atributos analíticos (i.e., actividad E)
 │
-└── exploration_queries                               <- Exploración de datos
+└── exploration_queries                               <- Scripts de SQL para exploración de datos
+    ├── 01_raw_data_exploration.sql                   <- Consultas de exploración de datos en bruto (i.e., soporte de actividad B)
+    ├── ⋅⋅⋅                                           <- Otras consultas en caso de ser requeridas
+    └── 0N_analytical_queries.sql                     <- Consultas de interés sobre los datos normalizados (i.e., soporte de actividad E)
 ```
+
+### Requerimientos para replicación del proyecto
+
+Para replicar este proyecto es necesario:
+
+1. Descargar los datos en bruto de acuerdo con la sección de **Fuente de datos**.
+2. Contar con PostgreSQL 16 o superior instalado.
+3. Crear una base de datos exclusiva para el proyecto.
+4. Contar con acceso a una terminal con `psql` o un cliente compatible (por ejemplo, TablePlus).
+5. Ejecutar los comandos desde la raíz del repositorio.
 
 ## Carga inicial
 
-El documento con la información originial de la página está en csv pero para recrearlo puedes descargar el siguiente link 
-donde los datos están en sql: 
-
-[➥ Descargar SQL](./datos/nuevo_acumulado_hechos_de_transito_2023_12.sql)
-
-En el siguiente apartado hay una descripción paso a paso para crear la base de datos con el sql del proyecto. 
-Favor de escribir los siguientes comandos en `psql`:
+En primer lugar, se debe crear una base de datos exclusiva para este proyecto. Para ello, ejecutar el siguiente comando en `psql`:
 
 ```{psql}
 CREATE DATABASE vialcdmx;
 ```
 
-Nos conectamos a la base de datos con la siguiente instrucción:
+Posteriormente, debemos conectarnos a dicha base de datos empleado:
 
 ```{psql}
 \c vialcdmx
 ```
 
-**Importante** para cargar los datos a la base creada se debe ejecutar lo siguiente...
- En TablePlus o cualquier otro GUI client: 
+Finalmente, para cargar los datos en bruto se debe ejecutar el siguiente comando en una sesión de línea de comandos `psql`:
 
 ```{psql}
--- PROYECTO: Accidentes de Tránsito CDMX
-CREATE SCHEMA IF NOT EXISTS raw;
-
-CREATE TABLE raw.datos_transitocdmx (
-    fecha_evento DATE, 
-    hora_evento TIME, 
-    tipo_evento TEXT, -- categoría del accidente
-    fecha_captura DATE,
-    folio TEXT,
-
-    latitud DOUBLE PRECISION, -- coordenada respecto norte-sur
-    longitud DOUBLE PRECISION, -- coordenada respecto a este-oeste
-
-    punto_1 TEXT, -- primera calle
-    punto_2 TEXT, -- segunda calle
-    colonia TEXT, 
-    alcaldia TEXT, 
-
-    zona_vial INT, -- zona vial numérica
-    sector TEXT, 
-    unidad_a_cargo TEXT, 
-
-    tipo_de_interseccion TEXT, -- forma del cruce: cruz, T, recta, curva, glorieta, entre otros
-    interseccion_semaforizada TEXT, 
-    clasificacion_de_la_vialidad TEXT, -- tipo de vialidad: eje vial, vía primaria, secundaria,
-    sentido_de_circulacion TEXT, 
-
-    dia TEXT, 
-    prioridad TEXT, -- nivel de prioridad del incidente
-    origen TEXT, -- medio por el cual se reportó el evento: radio, 911, etc.
-
-    unidad_medica_de_apoyo TEXT, -- institución o servicio médico que apoyó
-    matricula_unidad_medica TEXT, 
-    trasladado_lesionados TEXT, -- indica si hubo traslado de lesionados: SI/NO
-
-    personas_fallecidas INT, -- número de personas fallecidas
-    personas_lesionadas INT -- número de personas lesionadas
-);
-```
- En psql ejecutar lo siguiente...
-> 1. Para asegurar que se carguen bien los datos:
-```{psql}
-SET CLIENT_ENCODING TO 'UTF8';
-```
-> 2. Para cargar los datos:
-```{psql}
-SET CLIENT_ENCODING TO 'UTF8';
+\i pipeline_scripts/01_raw_data_schema_creation_and_load.sql
 ```
 
-> 3. Para copiar los datos del csv (el formato de la dirección del csv es relativa al read-me)
- ```{psql}
-\copy raw.datos_transitocdmx(fecha_evento,hora_evento,tipo_evento,fecha_captura,folio,latitud,longitud,punto_1,punto_2,colonia,alcaldia,zona_vial,sector,unidad_a_cargo,tipo_de_interseccion,interseccion_semaforizada,clasificacion_de_la_vialidad,sentido_de_circulacion,dia,prioridad,origen,unidad_medica_de_apoyo,matricula_unidad_medica,trasladado_lesionados,personas_fallecidas,personas_lesionadas)
-FROM 'nuevo_acumulado_hechos_de_transito_2023_12.csv'
-WITH (FORMAT CSV, HEADER true, DELIMITER ',');
-```
+> Esta es una buena sección para documentar los hallazgos del inciso B:
+> Carga inicial y análisis preliminar.
+
 ## Limpieza de datos
+
+El proceso de limpieza sigue una metodología de refresh destructivo, por lo que cada vez que se corra se generará desde
+cero el esquema y las tablas correspondientes. Para ejecutar el proceso de limpieza de datos se debe ejecutar el siguiente 
+comando en `psql`:
+
+```{psql}
+\i pipeline_scripts/02_data_cleaning.sql
+```
+
+> Aquí es una buena sección para documentar las actividades realizadas
+> de acuerdo a lo mencionado en el inciso C: Limpieza de datos
+
+## Normalización
+
+La normalización se realiza también mediante la estrategia de refresh destructivo. Para ejecutar el proceso de
+normalización se puede emplear el siguiente comando en `psql`:
+
+```{psql}
+\i pipeline_scripts/03_data_normalization.sql
+```
+
+>  Aquí es una buena sección para documentar la descomposición intuitiva de las tablas.
+> También un ERD del diseño final debe ser incluido.
+
+
 
