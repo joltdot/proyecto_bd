@@ -2,9 +2,9 @@
 
 ## Integrantes
 
-- Alexis Cuevas — CU: XXXXXX — GitHub: LINK  
+- Alexis Cuevas — CU: 219050 — GitHub: https://github.com/alexiscuevasheras  
 - Ben Zimbron — CU: XXXXXX — GitHub: LINK  
-- Dominique Ontiveros — CU: XXXXXX — GitHub: LINK  
+- Dominique Ontiveros — CU: 220552 — GitHub: LINK  
 - Fernando Gutiérrez — CU:  216761 — GitHub: https://github.com/ferdgm
 - Juan Pablo Montiel — CU: 220172 — GitHub: https://github.com/joldot  
 
