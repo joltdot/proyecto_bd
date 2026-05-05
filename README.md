@@ -4,7 +4,7 @@
 
 - Alexis Cuevas — CU: 219050 — GitHub: https://github.com/alexiscuevasheras  
 - Ben Zimbron — CU: XXXXXX — GitHub: https://github.com/benbenutoravioli
-- Dominique Ontiveros — CU: 220552 — GitHub: LINK  
+- Dominique Ontiveros — CU: 220552 — GitHub: https://github.com/Domdimad0m 
 - Fernando Gutiérrez — CU:  216761 — GitHub: https://github.com/ferdgm
 - Juan Pablo Montiel — CU: 220172 — GitHub: https://github.com/joldot  
 
