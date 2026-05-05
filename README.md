@@ -74,13 +74,13 @@ El conjunto de datos contiene aproximadamente 134,079 registros anuales, con 26 
 - origen  
 - trasladado_lesionados  
 - tipo_vehiculo  
+- colonia  
+- alcaldia  
+- sector  
 
 ### Atributos de texto
 
 - folio  
-- colonia  
-- alcaldia  
-- sector  
 - unidad_a_cargo  
 - unidad_medica_de_apoyo  
 - matricula_unidad_medica  
