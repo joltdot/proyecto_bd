@@ -54,44 +54,34 @@ Las instrucciones de replicación del proyecto asumen que los datos se encuentra
 
 El conjunto de datos contiene aproximadamente 134,079 registros anuales, con 26 atributos que describen cada incidente.
 
-### Atributos numéricos
-
-- latitud  
-- longitud  
-- personas_fallecidas  
-- personas_lesionadas  
-
-### Atributos categóricos
-
-- zona_vial  
-- tipo_evento  
-- tipo_de_interseccion  
-- interseccion_semaforizada  
-- clasificacion_de_la_vialidad  
-- sentido_de_circulacion  
-- dia  
-- prioridad  
-- origen  
-- trasladado_lesionados  
-- tipo_vehiculo  
-- colonia  
-- alcaldia  
-- sector  
-
-### Atributos de texto
-
-- folio  
-- unidad_a_cargo  
-- unidad_medica_de_apoyo  
-- matricula_unidad_medica  
-- punto_1  
-- punto_2  
-
-### Atributos temporales
-
-- fecha_evento  
-- hora_evento  
-- fecha_captura 
+|Atributo|Tipo|Descripción
+|--------|-----|----------|
+|Latitud|Numérico|----|
+|Longitud|Numérico|---|
+|personas_fallecidas|Numérico|---|
+|personas_lesionadas|Numérico|---|
+|zona_vial|Categórico|---|
+|tipo_evento|Categórico|---|
+|tipo_de_interseccion|Categórico|---|
+|interseccion_metaforizada|Categórico|---|
+|clasificacion_de_la_vialidad|Categórico|---|
+|sentido_de_circulacion|Categórico|---|
+|dia|Categórico|---|
+|prioridad|Categórico|---|
+|origen|Categórico|---|
+|traslado_lesionados|Categórico|---|
+|tipo_vehiculo|Categórico|---|
+|colonia|Categórico|---|
+|alcaldia|Categórico|---|
+|sector|Categórico|---|
+|folio|texto|---|
+|unidad_a_cargo|texto|---|
+|unidad_medica_de_apoyo|texto|---|
+|punto_1|texto|---|
+|punto_2|texto|---|
+|fecha_evento|temporal|---|
+|hora_evento|temporal|---|
+|fecha_captura|temporal|---|
 
 ## Documentación
 ---
