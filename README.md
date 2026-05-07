@@ -86,7 +86,7 @@ El conjunto de datos contiene aproximadamente 134,079 registros anuales, con 26 
 ## Documentación
 ---
 ### Estructura del repositorio
-El proyecto sigue una estructura modular para facilitar la reproducibilidad del pipeline de datos:}
+El proyecto sigue una estructura modular para facilitar la reproducibilidad del pipeline de datos:
 
 ```
 ├── README.md                                         <- Documentación para desarrolladores de este proyecto (i.e., reporte escrito)
