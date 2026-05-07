@@ -7,6 +7,7 @@ CREATE SCHEMA raw;
 -- Crear tabla de datos en bruto
 CREATE TABLE raw.datos_transitocdmx (
     
+    id BIGSERIAL PRIMARY KEY,
     fecha_evento DATE, 
     hora_evento TIME, 
     tipo_evento TEXT,
