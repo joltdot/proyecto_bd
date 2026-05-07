@@ -131,10 +131,10 @@ ORDER BY total DESC;
 --  Duplicados en atributos categóricos 
 
 SELECT
-    LOWER(TRIM(zona_vial)) AS zona_pura,
+    zona_vial AS zona_pura,
     COUNT(*) AS total
 FROM raw.datos_transitocdmx
-GROUP BY LOWER(TRIM(zona_vial))
+GROUP BY zona_vial
 ORDER BY total DESC;
 
 SELECT
