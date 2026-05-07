@@ -433,4 +433,5 @@ WHERE latitud IS NULL
 
 SELECT fecha_captura, COUNT(*) AS total
 FROM raw.datos_transitocdmx
-WHERE fecha_captura < fecha_evento;
+WHERE fecha_captura < fecha_evento
+GROUP BY fecha_captura;
