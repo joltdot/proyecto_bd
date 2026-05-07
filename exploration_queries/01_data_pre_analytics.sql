@@ -246,7 +246,7 @@ HAVING COUNT(*) > 1
 ORDER BY repeticiones DESC;
 
 
--- Conteo de nulos por atributoo
+-- Conteo de nulos por atributo
 
 SELECT 'fecha_evento' AS columna, COUNT(*) AS nulos
 FROM raw.datos_transitocdmx
@@ -426,9 +426,7 @@ WHERE (personas_fallecidas > 0 OR personas_lesionadas > 0)
 SELECT *
 FROM raw.datos_transitocdmx
 WHERE latitud IS NULL
-   OR longitud IS NULL
-   OR TRIM(latitud) = ''
-   OR TRIM(longitud) = '';
+   OR longitud IS NULL;
 
 
 -- Fechas de captura inconsistentes
