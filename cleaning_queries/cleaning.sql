@@ -10,19 +10,6 @@ INSERT INTO clean.datos_transitocdmx
 SELECT *
 from raw.datos_transitocdmx;
 
-select *
-from clean.datos_transitocdmx;
-
-SELECT *
-FROM clean.datos_transitocdmx;
-
---Hacer todos los días mayúsculas
-UPDATE clean.datos_transitocdmx
-SET dia = UPPER(dia);
-
---Quitar espacios vacíos en dia
-UPDATE clean.datos_transitocdmx
-SET dia = TRIM(dia);
 
 --El dia ya esta implicito en los atributos de fecha y no es necesario almacenarlo de manera independiente
 
@@ -64,9 +51,12 @@ COMMIT;
 
 --Clasificacion de la vialidad hay eje vial y ejevial
 
---Corregir formato dia-mes invertido
+    SELECT distinct clasificacion_de_la_vialidad
+    FROM clean.datos_transitocdmx;
 
-
+UPDATE clean.datos_transitocdmx
+    SET clasificacion_de_la_vialidad = 'EJE VIAL'
+    WHERE clasificacion_de_la_vialidad = 'EJEVIAL';
 
 
 --En algunos casos, mes y dia estaban intercambiados
@@ -113,7 +103,12 @@ UPDATE clean.datos_transitocdmx
 SET fecha_captura =  fecha_evento,
     fecha_evento = fecha_captura
 WHERE fecha_captura<fecha_evento;
+
 --unidad medica
+
+ALTER TABLE clean.datos_transitocdmx
+DROP COLUMN matricula_unidad_medica;
+
 
 --Nullificar sentidos de circulación ambiguos y corregir Typo
 
