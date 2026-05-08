@@ -42,7 +42,7 @@ Por ello, es importante interpretar los resultados con responsabilidad y dentro 
 
 Los datos utilizados en este proyecto provienen del Portal de Datos Abiertos de la Ciudad de México y son generados por la Secretaría de Seguridad Ciudadana (SSC) en colaboración con el C5 (Centro de Comando, Control, Cómputo, Comunicaciones y Contacto Ciudadano).
 
-Estos datos se recolectan a partir de reportes de emergencia y registros policiales, y se publican con fines de transparencia y análisis estadístico.
+Estos datos se recolectan a partir de reportes de emergencia y registros policiales, y se publican con fines de transparencia y análisis estadístico. Su frecuencia de actualización es mensual, aunque la última actualización disponible fue publicada el 23 de febrero de 2024 con información hasta el 31 de diciembre de 2023.
 
 Se pueden consultar en el siguiente enlace:
 
@@ -138,8 +138,109 @@ Finalmente, para cargar los datos en bruto se debe ejecutar el siguiente comando
 \i pipeline_scripts/01_raw_data_schema_creation_and_load.sql
 ```
 
-> Esta es una buena sección para documentar los hallazgos del inciso B:
-> Carga inicial y análisis preliminar.
+### Hallazgos del análisis preliminar
+
+El script de exploración se encuentra en `exploration_queries/01_data_pre_analytics.sql`. A continuación se resumen los hallazgos principales:
+
+**Registros totales:** 134,079 tuplas cargadas exitosamente.
+
+**Rango temporal:** Los datos abarcan del 1 de enero de 2018 al 31 de diciembre de 2023.
+
+**Valores únicos en columnas relevantes:**
+
+| Columna | Valores únicos |
+|---------|---------------|
+| folio | 126,472 |
+| colonia | 4,250 |
+| sector | 237 |
+| origen | 29 |
+| alcaldia | 18 |
+| tipo_evento | 6 |
+
+**Folio como posible llave:** El atributo 'folio' no es candidato a llave primaria ya que existen 7,288 registros con valor "SD" (sin dato) y algunos folios repetidos (hasta 5 veces).
+
+**Estadísticas numéricas:**
+
+| Atributo | Mínimo | Máximo | Promedio |
+|----------|--------|--------|----------|
+| zona_vial | 1 | 6 | 2.99 |
+| personas_fallecidas | 0 | 10 | 0.0195 |
+| personas_lesionadas | 0 | 25 | 1.1634 |
+
+No se encontraron valores negativos en personas fallecidas ni lesionadas.
+
+**Distribución por tipo de evento:**
+
+| Tipo evento | Total |
+|-------------|-------|
+| CHOQUE | 76,907 |
+| DERRAPADO | 24,940 |
+| ATROPELLADO | 24,844 |
+| CAIDA DE CICLISTA | 3,151 |
+| VOLCADURA | 2,296 |
+| CAIDA DE PASAJERO | 1,941 |
+
+**Distribución por alcaldía (top 5):**
+
+| Alcaldía | Total |
+|----------|-------|
+| CUAUHTEMOC | 19,669 |
+| IZTAPALAPA | 19,262 |
+| GUSTAVO A MADERO | 14,762 |
+| BENITO JUAREZ | 10,753 |
+| VENUSTIANO CARRANZA | 10,055 |
+
+**Valores nulos relevantes:**
+
+| Columna | Nulos |
+|---------|-------|
+| matricula_unidad_medica | 82,187 |
+| hora_evento | 5,009 |
+| latitud | 7 |
+| longitud | 4 |
+| trasladado_lesionados | 3 |
+| unidad_medica_de_apoyo | 2 |
+| folio | 1 |
+
+**Colonias con mayor incidencia (top 10):**
+
+| Colonia | Total |
+|---------|-------|
+| CENTRO | 3,719 |
+| MORELOS | 1,432 |
+| DOCTORES | 1,424 |
+| AGRICOLA ORIENTAL | 1,419 |
+| JUAREZ | 1,217 |
+| ROMA NTE | 1,176 |
+| GUERRERO | 1,134 |
+| OBRERA | 1,014 |
+| AGRICOLA PANTITLAN | 877 |
+| NARVARTE PTE | 858 |
+
+**Distribución por prioridad:**
+
+| Prioridad | Total |
+|-----------|-------|
+| BAJA | 103,200 |
+| MEDIA | 28,125 |
+| ALTA | 2,754 |
+
+**Origen del reporte (top 5):**
+
+| Origen | Total |
+|--------|-------|
+| LLAMADA DEL 911 | 65,167 |
+| (vacío) | 35,043 |
+| RADIO | 14,680 |
+| 911 CDMX | 10,769 |
+| BOTON DE AUXILIO | 4,628 |
+
+**Inconsistencias detectadas en atributos categóricos:**
+
+- En `dia` se encontraron 19 valores distintos cuando solo debería haber 7. Existen errores tipográficos como "Mábado", "Siérco", "S<c3>érco" y valores que no corresponden a días como "Ruben leñero", "Taxqueña", "Coruña" y "1° de mayo".
+- En `alcaldia` aparecen 18 valores cuando la CDMX tiene 16 alcaldías. Se detectó "AV INSURGENTES" (que no es una alcaldía) y una duplicación por diferencia en puntuación: "GUSTAVO A MADERO" vs "GUSTAVO A. MADERO".
+- En `origen` se detectó duplicación por diferencia de tilde: "BOTON DE AUXILIO" vs "BOTÓN DE AUXILIO". Además, 35,043 registros (26%) no tienen origen registrado.
+- No se encontraron filas completamente duplicadas al comparar por fecha, hora, tipo de evento, folio, latitud, longitud y alcaldía.
 
 ## Limpieza de datos
 

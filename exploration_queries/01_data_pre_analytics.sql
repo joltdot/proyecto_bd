@@ -269,8 +269,7 @@ UNION ALL
 
 SELECT 'hora_evento', COUNT(*)
 FROM raw.datos_transitocdmx
-WHERE hora_evento IS NULL OR TRIM(hora_evento) = ''
--- Las variables tipo TEXT pueden contener espacios vacíos.
+WHERE hora_evento IS NULL
 
 UNION ALL
 
@@ -282,7 +281,7 @@ UNION ALL
 
 SELECT 'fecha_captura', COUNT(*)
 FROM raw.datos_transitocdmx
-WHERE fecha_captura IS NULL OR TRIM(fecha_captura) = ''
+WHERE fecha_captura IS NULL
 
 UNION ALL
 
@@ -294,13 +293,13 @@ UNION ALL
 
 SELECT 'latitud', COUNT(*)
 FROM raw.datos_transitocdmx
-WHERE latitud IS NULL OR TRIM(latitud) = ''
+WHERE latitud IS NULL
 
 UNION ALL
 
 SELECT 'longitud', COUNT(*)
 FROM raw.datos_transitocdmx
-WHERE longitud IS NULL OR TRIM(longitud) = ''
+WHERE longitud IS NULL
 
 UNION ALL
 
