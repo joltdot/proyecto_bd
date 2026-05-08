@@ -56,34 +56,34 @@ Las instrucciones de replicación del proyecto asumen que los datos se encuentra
 
 El conjunto de datos contiene aproximadamente 134,079 registros anuales, con 26 atributos que describen cada incidente.
 
-|Atributo|Tipo|Descripción
+|Atributo|Tipo|Descripción|
 |--------|-----|----------|
-|Latitud|Numérico|----|
-|Longitud|Numérico|---|
-|personas_fallecidas|Numérico|---|
-|personas_lesionadas|Numérico|---|
-|zona_vial|Categórico|---|
-|tipo_evento|Categórico|---|
-|tipo_de_interseccion|Categórico|---|
-|interseccion_metaforizada|Categórico|---|
-|clasificacion_de_la_vialidad|Categórico|---|
-|sentido_de_circulacion|Categórico|---|
-|dia|Categórico|---|
-|prioridad|Categórico|---|
-|origen|Categórico|---|
-|traslado_lesionados|Categórico|---|
-|tipo_vehiculo|Categórico|---|
-|colonia|Categórico|---|
-|alcaldia|Categórico|---|
-|sector|Categórico|---|
-|folio|texto|---|
-|unidad_a_cargo|texto|---|
-|unidad_medica_de_apoyo|texto|---|
-|punto_1|texto|---|
-|punto_2|texto|---|
-|fecha_evento|temporal|---|
-|hora_evento|temporal|---|
-|fecha_captura|temporal|---|
+|latitud|Numérico|Coordenada de latitud del incidente|
+|longitud|Numérico|Coordenada de longitud del incidente|
+|personas_fallecidas|Numérico|Número de personas fallecidas en el incidente|
+|personas_lesionadas|Numérico|Número de personas lesionadas en el incidente|
+|zona_vial|Categórico|Zona vial donde ocurrió el incidente (valores del 1 al 6)|
+|tipo_evento|Categórico|Clasificación del accidente (choque, atropellado, derrapado, volcadura, caída de ciclista, caída de pasajero)|
+|tipo_de_interseccion|Categórico|Geometría de la intersección donde ocurrió el incidente (cruz, Y, glorieta, curva, desnivel, etc.)|
+|interseccion_semaforizada|Categórico|Indica si la intersección cuenta con semáforo (SI/NO)|
+|clasificacion_de_la_vialidad|Categórico|Tipo de vialidad donde ocurrió el incidente (vía primaria, vía secundaria, eje vial, acceso carretero, etc.)|
+|sentido_de_circulacion|Categórico|Sentido cardinal de circulación de la vialidad donde ocurrió el incidente|
+|dia|Categórico|Día de la semana en que ocurrió el incidente|
+|prioridad|Categórico|Nivel de prioridad asignado al incidente (alta, media, baja)|
+|origen|Categórico|Canal por el cual se reportó el incidente (llamada 911, radio, cámara, botón de auxilio, etc.)|
+|trasladado_lesionados|Categórico|Indica si los lesionados fueron trasladados a una unidad médica (SI/NO)|
+|colonia|Categórico|Colonia donde ocurrió el incidente|
+|alcaldia|Categórico|Alcaldía de la Ciudad de México donde ocurrió el incidente|
+|sector|Categórico|Sector policial que atendió el incidente|
+|folio|Texto|Identificador alfanumérico asignado al reporte del incidente|
+|unidad_a_cargo|Texto|Matrícula de la unidad policial que atendió el incidente|
+|unidad_medica_de_apoyo|Texto|Identificador de la unidad médica que brindó apoyo|
+|matricula_unidad_medica|Texto|Matrícula de la unidad médica que atendió el incidente|
+|punto_1|Texto|Nombre de la primera vialidad de referencia del incidente|
+|punto_2|Texto|Nombre de la segunda vialidad de referencia|
+|fecha_evento|Temporal|Fecha en que ocurrió el incidente|
+|hora_evento|Temporal|Hora en que ocurrió el incidente|
+|fecha_captura|Temporal|Fecha en que se capturó el registro en el sistema|
 
 ## Documentación
 ---
@@ -240,6 +240,7 @@ No se encontraron valores negativos en personas fallecidas ni lesionadas.
 - En `dia` se encontraron 19 valores distintos cuando solo debería haber 7. Existen errores tipográficos como "Mábado", "Siérco", "S<c3>érco" y valores que no corresponden a días como "Ruben leñero", "Taxqueña", "Coruña" y "1° de mayo".
 - En `alcaldia` aparecen 18 valores cuando la CDMX tiene 16 alcaldías. Se detectó "AV INSURGENTES" (que no es una alcaldía) y una duplicación por diferencia en puntuación: "GUSTAVO A MADERO" vs "GUSTAVO A. MADERO".
 - En `origen` se detectó duplicación por diferencia de tilde: "BOTON DE AUXILIO" vs "BOTÓN DE AUXILIO". Además, 35,043 registros (26%) no tienen origen registrado.
+- Se encontraron 9,221 registros donde `fecha_captura` es anterior a `fecha_evento`, lo cual es lógicamente imposible. El patrón sugiere una inversión de día y mes en el parseo de las fechas (formato DD/MM interpretado como MM/DD).
 - No se encontraron filas completamente duplicadas al comparar por fecha, hora, tipo de evento, folio, latitud, longitud y alcaldía.
 
 ## Limpieza de datos

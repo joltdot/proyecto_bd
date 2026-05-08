@@ -441,9 +441,15 @@ WHERE latitud IS NULL
    OR longitud IS NULL;
 
 
--- Fechas de captura inconsistentes
+-- Fechas de captura inconsistentes (fecha_captura anterior a fecha_evento)
 
-SELECT fecha_captura, COUNT(*) AS total
+SELECT COUNT(*) AS total_inconsistentes
+FROM raw.datos_transitocdmx
+WHERE fecha_captura < fecha_evento;
+
+-- Detalle de pares fecha_evento/fecha_captura inconsistentes para identificar patrón de inversión día/mes
+SELECT fecha_evento, fecha_captura, fecha_captura - fecha_evento AS diferencia_dias, COUNT(*) AS total
 FROM raw.datos_transitocdmx
 WHERE fecha_captura < fecha_evento
-GROUP BY fecha_captura;
+GROUP BY fecha_evento, fecha_captura
+ORDER BY total DESC;
