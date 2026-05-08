@@ -21,23 +21,10 @@ SET dia = UPPER(dia);
 UPDATE clean.datos_transitocdmx
 SET dia = TRIM(dia);
 
---En dia hay inconsistencias de tildes y hay días que no existen como S<c3>érco, Calzada Taxqueña,etc...
+--El dia ya esta implicito en los atributos de fecha y no es necesario almacenarlo de manera independiente
 
-SELECT DISTINCT dia
-from clean.datos_transitocdmx;
+ALTER TABLE clean.datos_transitocdmx DROP COLUMN dia;
 
-
-UPDATE clean.datos_transitocdmx
-SET dia = 'SABADO'
-WHERE dia IN ('SÁBADO', 'MÁBADO');
-
-UPDATE clean.datos_transitocdmx
-SET dia = 'MIERCOLES'
-WHERE dia IN ('S<C3>ÉRCO', 'SIÉRCO', 'MIÉRCO', 'MIÉRCOLES');
-
-UPDATE clean.datos_transitocdmx
-SET dia = NULL
-WHERE dia NOT IN ('DOMINGO', 'SABADO','JUEVES','MARTES','MIERCOLES','VIERNES','LUNES');
 
 --En origen hay datos raros como sábado, inconsistencias por tildes en las palabras policía, cámara y botón. Dice MI C4LLE en vez de MI CALLE
 SELECT DISTINCT origen
