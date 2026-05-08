@@ -31,7 +31,7 @@ SELECT DISTINCT origen
 FROM clean.datos_transitocdmx;
     --Reemplazo las tildes
 UPDATE clean.datos_transitocdmx
-SET origen = translate(origen, 'ÁÉÍÓÚ', 'AEIOU');
+SET origen = TRANSLATE(origen, 'ÁÉÍÓÚ', 'AEIOU');
 
 
 --Inconsistencias y datos raros en tipo_interseccion
