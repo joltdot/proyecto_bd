@@ -89,6 +89,19 @@ SELECT
     COUNT(*) AS total
 FROM raw.datos_transitocdmx
 GROUP BY alcaldia
+ORDER BY total DESC; -- La alcaldía Gustavo A. Madero se repite y "AV INSURGENTES" sale como alcaldía
+
+SELECT *
+FROM raw.datos_transitocdmx
+WHERE alcaldia = 'AV INSURGENTES'; -- sucedió en la colonia STA MA LA RIBERA, ubicada en la alcaldía Cuahtémoc,
+-- habría que actualizar
+
+-- Conteo por colonia
+SELECT
+    colonia,
+    COUNT(*) AS total
+FROM raw.datos_transitocdmx
+GROUP BY colonia
 ORDER BY total DESC;
 
 

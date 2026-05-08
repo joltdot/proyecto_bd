@@ -51,3 +51,23 @@ SET origen = translate(origen, 'ÁÉÍÓÚ', 'AEIOU');
 --Clasificacion de la vialidad hay eje vial y ejevial
 --sentido de circulación y unidad medica
 
+-- Contexto
+SELECT
+    alcaldia,
+    COUNT(*) AS total
+FROM clean.datos_transitocdmx
+GROUP BY alcaldia
+ORDER BY total DESC;
+
+SELECT colonia
+FROM clean.datos_transitocdmx
+WHERE alcaldia = 'AV INSURGENTES';
+
+-- Gustavo A Madero está repetido
+UPDATE clean.datos_transitocdmx
+SET alcaldia = 'GUSTAVO A MADERO'
+WHERE alcaldia = 'GUSTAVO A. MADERO';
+-- Un caso donde Av Insurgentes se cuenta como alcaldía (checar la primer exploration query)
+UPDATE clean.datos_transitocdmx
+SET alcaldia = 'CUAUHTEMOC'
+WHERE alcaldia = 'AV INSURGENTES';
