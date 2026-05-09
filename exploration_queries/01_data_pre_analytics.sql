@@ -1,5 +1,8 @@
 -- Análisis exploratorio de los datos.
 
+    SELECT *
+    FROM raw.datos_transitocdmx;
+
 
 -- Conteo total de registros
 SELECT COUNT(*) AS total_registros
@@ -440,7 +443,6 @@ FROM raw.datos_transitocdmx
 WHERE latitud IS NULL
    OR longitud IS NULL;
 
-
 -- Fechas de captura inconsistentes (fecha_captura anterior a fecha_evento)
 
 SELECT COUNT(*) AS total_inconsistentes
@@ -453,3 +455,5 @@ FROM raw.datos_transitocdmx
 WHERE fecha_captura < fecha_evento
 GROUP BY fecha_evento, fecha_captura
 ORDER BY total DESC;
+
+

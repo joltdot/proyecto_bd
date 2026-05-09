@@ -10,14 +10,14 @@ INSERT INTO clean.datos_transitocdmx
 SELECT *
 from raw.datos_transitocdmx;
 
--- DEPURACIÓN DE CADA ATRIBUTO 
+-- DEPURACIÓN DE CADA ATRIBUTO
 
--- ELIMINACIÓN DE ATRIBUTOS REPETITIVOS 
+-- ELIMINACIÓN DE ATRIBUTOS REPETITIVOS
 --El dia ya esta implicito en los atributos de fecha y no es necesario almacenarlo de manera independiente
 
 ALTER TABLE clean.datos_transitocdmx
     DROP COLUMN dia;
-    
+
 
 
 --DEPURACIÓN DE ATRIBUTOS SUCIOS
@@ -43,7 +43,7 @@ START TRANSACTION;
 UPDATE clean.datos_transitocdmx
 SET origen = 'BOTON DE AUXILIO'
 WHERE origen IN ('BOTÓN DE AUXILIO','BOTON DE AUXILIO','MI CALLE(BOTON)','MI C911E', 'MI CALLE'); --DOMDOM: LO QUE ENTENDÍ ES QUE CUANDO DICEN MI CALLE SE REFIERE AL BOTON ASI QUE HOMOLOGUE
-COMMIT; 
+COMMIT;
 
 -- Homologar variantes de camara / cámara
 UPDATE clean.datos_transitocdmx
@@ -106,15 +106,15 @@ GROUP BY tipo_de_interseccion
 ORDER BY total DESC;
 
 
--- ATRIBUTO: clasificacion_de_la_vialidad 
+-- ATRIBUTO: clasificacion_de_la_vialidad
 
 -- Homologar eje vial y ejevial
 
 UPDATE clean.datos_transitocdmx
     SET clasificacion_de_la_vialidad = 'EJE VIAL'
     WHERE clasificacion_de_la_vialidad = 'EJEVIAL';
-    
-    
+
+
 -- Verificación (sirve para ver si la columna de clasificacion_de_la_vialidad está limpia)
 SELECT clasificacion_de_la_vialidad, COUNT(*) AS total
 FROM clean.datos_transitocdmx
