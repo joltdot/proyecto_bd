@@ -1,5 +1,6 @@
 --Creamos esquema para limpiar los datos
 CREATE SCHEMA clean;
+DROP SCHEMA IF EXISTS clean CASCADE;
 
 --Duplicamos la tabla raw
 CREATE TABLE clean.datos_transitocdmx
@@ -10,52 +11,52 @@ INSERT INTO clean.datos_transitocdmx
 SELECT *
 from raw.datos_transitocdmx;
 
--- DEPURACIÓN DE CADA ATRIBUTO
+-- DEPURACIÓN DE CADA ATRIBUTO 
 
--- ELIMINACIÓN DE ATRIBUTOS REPETITIVOS
+-- ELIMINACIÓN DE ATRIBUTOS REPETITIVOS 
 --El dia ya esta implicito en los atributos de fecha y no es necesario almacenarlo de manera independiente
 
 ALTER TABLE clean.datos_transitocdmx
     DROP COLUMN dia;
+    
+--UNIDAD MEDICA: Funciona más como identificador operativo interno que como variable analítica por ello no se tomará en cuenta.
 
+ALTER TABLE clean.datos_transitocdmx
+DROP COLUMN matricula_unidad_medica;
+    
 
 
 --DEPURACIÓN DE ATRIBUTOS SUCIOS
 
 -- ATRIBUTO: origen
+-- Verificación (sirve para ver si la columna de origen está limpia)
+SELECT origen, COUNT(*) AS total
+FROM clean.datos_transitocdmx
+GROUP BY origen
+ORDER BY total DESC;
+
 --En origen hay datos raros como sábado, inconsistencias por tildes en las palabras policía, cámara y botón. Dice MI C4LLE en vez de MI CALLE
-SELECT DISTINCT origen
-FROM clean.datos_transitocdmx;
 
---Reemplazo las tildes
+--LIMPIEZA GENERAL DE DATOS
+--Reemplazo de tildes, borramos espacios inecesarios, pasamos todo a mayúsculas
 UPDATE clean.datos_transitocdmx
-SET origen = TRANSLATE(origen, 'ÁÉÍÓÚ', 'AEIOU');
-
---Reemplazo de categorías sin sentido a NA (ejemplo: sabado, pm )
-START TRANSACTION;
-UPDATE clean.datos_transitocdmx
-SET origen = 'NA'
-WHERE origen IN ('NA', 'N/A', 'SD', '', 'sábado', 'PM');
-COMMIT;
-
--- Homologar la categoría 911: pues hay variantes inecesarias como "911CDMX" o "LLAMADA A 911"
-START TRANSACTION;
-UPDATE clean.datos_transitocdmx
-SET origen = 'BOTON DE AUXILIO'
-WHERE origen IN ('BOTÓN DE AUXILIO','BOTON DE AUXILIO','MI CALLE(BOTON)','MI C911E', 'MI CALLE'); --DOMDOM: LO QUE ENTENDÍ ES QUE CUANDO DICEN MI CALLE SE REFIERE AL BOTON ASI QUE HOMOLOGUE
-COMMIT;
-
--- Homologar variantes de camara / cámara
-UPDATE clean.datos_transitocdmx
-SET origen = 'CAMARA'
-WHERE origen IN ('CÁMARA','CAMARA');
+SET origen = UPPER(TRIM(TRANSLATE(origen, 'ÁÉÍÓÚáéíóú', 'AEIOUaeiou')));
 
 -- Homologar variantes relacionadas con 911.
--- Aquí dejamos LLAMADA DEL 911 separada de 911 CDMX, porque la llamada pudo realizarse fuera de la ciudad.
+-- Aquí dejamos LLAMADA DEL 911 separada de 911 CDMX.
 START TRANSACTION;
 UPDATE clean.datos_transitocdmx
 SET origen = '911 CDMX'
-WHERE origen IN ('911CDMX','APP 911CDMX','911 CDMX CHAT');
+WHERE origen ILIKE '%911%';
+COMMIT;
+
+
+-- Homologar la categoría botón ya que mi calle es de acuerdo a los datos parte de la categiría de botón de auxilio
+START TRANSACTION;
+UPDATE clean.datos_transitocdmx
+SET origen = 'BOTON DE AUXILIO'
+WHERE origen ILIKE '%BOTON%'
+   OR origen ILIKE '%AUXILIO%';
 COMMIT;
 
 -- Homologar redes sociales.
@@ -64,21 +65,41 @@ SET origen = 'REDES SOCIALES'
 WHERE origen IN ('REDES','REDES SOCIALES');
 
 
--- Homologar errores por tilde en policía.
+--Reemplazo de categorías sin sentido a NULL (ejemplo: sabado)
+START TRANSACTION;
 UPDATE clean.datos_transitocdmx
-SET origen = 'MI POLICIA NEGOCIO'
-WHERE origen IN ('MI POLICIA NEGOCIO','MI POLICÍA NEGOCIO');
+SET origen = NULL
+WHERE origen IS NOT NULL
+AND origen ILIKE '%SABADO%';
+COMMIT;
+ROLLBACK;
+
+
+-- Atributos que se mencionaron menos de 10 veces pasan a categoría de OTROS
+-- No se nulearon valores como SD dado que pueda tratarse de algun acrónimo muy particular que represente una categoría válida para origen
+START TRANSACTION;
+UPDATE clean.datos_transitocdmx
+SET origen = 'OTROS'
+WHERE origen IN (
+    SELECT origen
+    FROM clean.datos_transitocdmx
+    WHERE origen IS NOT NULL
+    GROUP BY origen
+    HAVING COUNT(*) < 10
+);
+COMMIT;
+ROLLBACK;
 
 
 
--- Verificación (sirve para ver si la columna de origen está limpia)
-SELECT origen, COUNT(*) AS total
-FROM clean.datos_transitocdmx
-GROUP BY origen
-ORDER BY total DESC;
 
 
 -- ATRIBUTO : tipo_de_interseccion
+-- Verificación (sirve para ver si la columna de tipo_de_interseccion está limpia)
+SELECT tipo_de_interseccion, COUNT(*) AS total
+FROM clean.datos_transitocdmx
+GROUP BY tipo_de_interseccion
+ORDER BY total DESC;
 
 
 --Una interseccion decia AJUSCO, buscamos las calles y vimos que es interseccion tipo T
@@ -86,9 +107,7 @@ UPDATE clean.datos_transitocdmx
 SET tipo_de_interseccion = 'T'
 WHERE tipo_de_interseccion LIKE 'AJUSCO';
 
-SELECT *
-    from clean.datos_transitocdmx
-        where tipo_de_interseccion LIKE 'CRUZO';
+
 
 --Otra interseccion decía CRUZO en vez de CRUZ (verificamos con Maps)
     START TRANSACTION;
@@ -99,30 +118,31 @@ COMMIT;
 
 
 
--- Verificación (sirve para ver si la columna de tipo_de_interseccion está limpia)
-SELECT tipo_de_interseccion, COUNT(*) AS total
-FROM clean.datos_transitocdmx
-GROUP BY tipo_de_interseccion
-ORDER BY total DESC;
 
 
--- ATRIBUTO: clasificacion_de_la_vialidad
 
--- Homologar eje vial y ejevial
-
-UPDATE clean.datos_transitocdmx
-    SET clasificacion_de_la_vialidad = 'EJE VIAL'
-    WHERE clasificacion_de_la_vialidad = 'EJEVIAL';
-
-
+-- ATRIBUTO: clasificacion_de_la_vialidad 
 -- Verificación (sirve para ver si la columna de clasificacion_de_la_vialidad está limpia)
 SELECT clasificacion_de_la_vialidad, COUNT(*) AS total
 FROM clean.datos_transitocdmx
 GROUP BY clasificacion_de_la_vialidad
 ORDER BY total DESC;
 
+-- Homologar eje vial y ejevial
+
+UPDATE clean.datos_transitocdmx
+    SET clasificacion_de_la_vialidad = 'EJE VIAL'
+    WHERE clasificacion_de_la_vialidad = 'EJEVIAL';
+    
+   
 
 -- ATRIBUTO: fecha_captura
+-- Verificación (sirve para ver si la columna de fecha_captura está limpia)
+SELECT fecha_captura, COUNT(*) AS total
+FROM clean.datos_transitocdmx
+GROUP BY fecha_captura
+ORDER BY total DESC;
+
 --En algunos casos, mes y dia estaban intercambiados
 UPDATE clean.datos_transitocdmx
 SET fecha_captura =  make_date(
@@ -138,7 +158,7 @@ UPDATE clean.datos_transitocdmx
     SET fecha_captura = make_date(2019,
                         EXTRACT(MONTH FROM fecha_captura)::int,
                         EXTRACT(DAY FROM fecha_captura)::int)
-WHERE fecha_captura<fecha_evento
+WHERE fecha_captura::date<fecha_evento::date --los casteos solo son preventivos
 AND NOT extract(DAY FROM fecha_captura) >12
 AND fecha_captura = '2018-01-04';
 
@@ -150,17 +170,32 @@ SET fecha_captura =  fecha_evento,
 WHERE fecha_captura<fecha_evento
 AND NOT extract(DAY FROM fecha_captura) >12;
 
+
+SELECT id, fecha_evento,
+       fecha_captura
+FROM clean.datos_transitocdmx
+    WHERE fecha_captura<fecha_evento
+    AND extract(DAY FROM fecha_captura) >12;
+
 --Quedaban 4 donde fecha_captura, fecha_evento están flipeados
 UPDATE clean.datos_transitocdmx
 SET fecha_captura =  fecha_evento,
     fecha_evento = fecha_captura
 WHERE fecha_captura<fecha_evento;
 
---unidad medica
 
-ALTER TABLE clean.datos_transitocdmx
-DROP COLUMN matricula_unidad_medica;
 
+-- ATRIBUTO: interseccion_semaforizada
+-- Verificación (sirve para ver si la columna de XXXX está limpia)
+SELECT interseccion_semaforizada, COUNT(*) AS total
+FROM clean.datos_transitocdmx
+GROUP BY interseccion_semaforizada
+ORDER BY total DESC;
+
+-- Homologar N como NO
+UPDATE clean.datos_transitocdmx
+SET interseccion_semaforizada =  'NO'
+WHERE interseccion_semaforizada ILIKE '%N%';
 
 --Nullificar sentidos de circulación ambiguos y corregir Typo
 
