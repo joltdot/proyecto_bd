@@ -253,8 +253,17 @@ comando en `psql`:
 \i pipeline_scripts/02_data_cleaning.sql
 ```
 
-> Aquí es una buena sección para documentar las actividades realizadas
-> de acuerdo a lo mencionado en el inciso C: Limpieza de datos
+**Desglose de limpieza de datos:**
+| Atributo(s) | Operación(es) | Observación  |
+|-------------|---------------|--------------|
+| `fecha_evento`, `fecha_captura` | `UPDATE` | En algunos casos, para `fecha_captura`, el mes y el día estaban intercambiados. Para este mismo atributo, había tuplas con año incorrecto. Además, había tuplas con ambos atributos intercambiados. |
+| `dia`  | `DROP COLUMN`  | Ya está implícito en los atributos de fecha, si llega a ser necesario se extraerá de estos. |
+| `tipo_de_interseccion` | `UPDATE`, `RENAME COLUMN` | Inconsistencias en el nombre de intersecciones. Se renombró a `intersección` para facilidad de manipulación. |
+| `clasificacion_de_la_vialidad` | `UPDATE`, `RENAME COLUMN` |  Inconsistencias en la clasificación de vialidades. Se renombró a `vialidad` para facilidad de manipulación.|
+| `sentido_de_circulación` | `UPDATE` |  Corrección de inconsistencias y nullificación de valores ambiguos. |
+| `alcaldía` | `UPDATE` | Correción de inconsistencias en valores de alcaldías. |
+| `origen` | `UPDATE` | Inconsistencias por errores de ortografía o typos |
+| `matricula_unidad_medica` | `DROP COLUMN` | Columna irrelevante |
 
 ## Normalización
 
