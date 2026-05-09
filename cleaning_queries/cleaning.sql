@@ -10,9 +10,6 @@ INSERT INTO clean.datos_transitocdmx
 SELECT *
 from raw.datos_transitocdmx;
 
-SELECT * FROM clean.datos_transitocdmx;
-
-
 -- DEPURACIÓN DE CADA ATRIBUTO 
 
 -- ELIMINACIÓN DE ATRIBUTOS REPETITIVOS 
@@ -25,7 +22,7 @@ ALTER TABLE clean.datos_transitocdmx
 
 --DEPURACIÓN DE ATRIBUTOS SUCIOS
 
--- ATRIBUTO: ORIGEN
+-- ATRIBUTO: origen
 --En origen hay datos raros como sábado, inconsistencias por tildes en las palabras policía, cámara y botón. Dice MI C4LLE en vez de MI CALLE
 SELECT DISTINCT origen
 FROM clean.datos_transitocdmx;
@@ -35,14 +32,18 @@ UPDATE clean.datos_transitocdmx
 SET origen = TRANSLATE(origen, 'ÁÉÍÓÚ', 'AEIOU');
 
 --Reemplazo de categorías sin sentido a NA (ejemplo: sabado, pm )
+START TRANSACTION;
 UPDATE clean.datos_transitocdmx
-SET origen = NULL
+SET origen = 'NA'
 WHERE origen IN ('NA', 'N/A', 'SD', '', 'sábado', 'PM');
+COMMIT;
 
 -- Homologar la categoría 911: pues hay variantes inecesarias como "911CDMX" o "LLAMADA A 911"
+START TRANSACTION;
 UPDATE clean.datos_transitocdmx
 SET origen = 'BOTON DE AUXILIO'
 WHERE origen IN ('BOTÓN DE AUXILIO','BOTON DE AUXILIO','MI CALLE(BOTON)','MI C911E', 'MI CALLE'); --DOMDOM: LO QUE ENTENDÍ ES QUE CUANDO DICEN MI CALLE SE REFIERE AL BOTON ASI QUE HOMOLOGUE
+COMMIT; 
 
 -- Homologar variantes de camara / cámara
 UPDATE clean.datos_transitocdmx
@@ -51,10 +52,11 @@ WHERE origen IN ('CÁMARA','CAMARA');
 
 -- Homologar variantes relacionadas con 911.
 -- Aquí dejamos LLAMADA DEL 911 separada de 911 CDMX, porque la llamada pudo realizarse fuera de la ciudad.
+START TRANSACTION;
 UPDATE clean.datos_transitocdmx
 SET origen = '911 CDMX'
 WHERE origen IN ('911CDMX','APP 911CDMX','911 CDMX CHAT');
-
+COMMIT;
 
 -- Homologar redes sociales.
 UPDATE clean.datos_transitocdmx
@@ -68,40 +70,59 @@ SET origen = 'MI POLICIA NEGOCIO'
 WHERE origen IN ('MI POLICIA NEGOCIO','MI POLICÍA NEGOCIO');
 
 
--- Verificación (sirve para ver si la columna de origen está limpia
+
+-- Verificación (sirve para ver si la columna de origen está limpia)
 SELECT origen, COUNT(*) AS total
 FROM clean.datos_transitocdmx
 GROUP BY origen
 ORDER BY total DESC;
 
 
+-- ATRIBUTO : tipo_de_interseccion
 
---Inconsistencias y datos raros en tipo_interseccion
 
 --Una interseccion decia AJUSCO, buscamos las calles y vimos que es interseccion tipo T
 UPDATE clean.datos_transitocdmx
 SET tipo_de_interseccion = 'T'
 WHERE tipo_de_interseccion LIKE 'AJUSCO';
 
---Otra interseccion decía CRUZO en vez de CRUZ (verificamos con Maps)
+SELECT *
+    from clean.datos_transitocdmx
+        where tipo_de_interseccion LIKE 'CRUZO';
 
+--Otra interseccion decía CRUZO en vez de CRUZ (verificamos con Maps)
+    START TRANSACTION;
 UPDATE clean.datos_transitocdmx
     SET tipo_de_interseccion = 'CRUZ'
 WHERE tipo_de_interseccion = 'CRUZO';
+COMMIT;
 
--- Finalmente, renombramos para mayor facilidad de trabajo con esta columna ya que no hay problema de interpretación
-ALTER TABLE clean.datos_transitocdmx RENAME COLUMN tipo_de_interseccion TO interseccion;
 
---Clasificacion de la vialidad hay eje vial y ejevial
+
+-- Verificación (sirve para ver si la columna de tipo_de_interseccion está limpia)
+SELECT tipo_de_interseccion, COUNT(*) AS total
+FROM clean.datos_transitocdmx
+GROUP BY tipo_de_interseccion
+ORDER BY total DESC;
+
+
+-- ATRIBUTO: clasificacion_de_la_vialidad 
+
+-- Homologar eje vial y ejevial
 
 UPDATE clean.datos_transitocdmx
     SET clasificacion_de_la_vialidad = 'EJE VIAL'
     WHERE clasificacion_de_la_vialidad = 'EJEVIAL';
+    
+    
+-- Verificación (sirve para ver si la columna de clasificacion_de_la_vialidad está limpia)
+SELECT clasificacion_de_la_vialidad, COUNT(*) AS total
+FROM clean.datos_transitocdmx
+GROUP BY clasificacion_de_la_vialidad
+ORDER BY total DESC;
 
--- Finalmente, renombramos para mayor facilidad de trabajo con esta columna ya que no hay problema de interpretación
-ALTER TABLE clean.datos_transitocdmx RENAME COLUMN clasificacion_de_la_vialidad TO vialidad;
 
-
+-- ATRIBUTO: fecha_captura
 --En algunos casos, mes y dia estaban intercambiados
 UPDATE clean.datos_transitocdmx
 SET fecha_captura =  make_date(
