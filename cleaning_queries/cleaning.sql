@@ -13,18 +13,67 @@ from raw.datos_transitocdmx;
 SELECT * FROM clean.datos_transitocdmx;
 
 
+-- DEPURACIÓN DE CADA ATRIBUTO 
+
+-- ELIMINACIÓN DE ATRIBUTOS REPETITIVOS 
 --El dia ya esta implicito en los atributos de fecha y no es necesario almacenarlo de manera independiente
 
 ALTER TABLE clean.datos_transitocdmx
     DROP COLUMN dia;
+    
 
 
+--DEPURACIÓN DE ATRIBUTOS SUCIOS
+
+-- ATRIBUTO: ORIGEN
 --En origen hay datos raros como sábado, inconsistencias por tildes en las palabras policía, cámara y botón. Dice MI C4LLE en vez de MI CALLE
 SELECT DISTINCT origen
 FROM clean.datos_transitocdmx;
+
 --Reemplazo las tildes
 UPDATE clean.datos_transitocdmx
 SET origen = TRANSLATE(origen, 'ÁÉÍÓÚ', 'AEIOU');
+
+--Reemplazo de categorías sin sentido a NA (ejemplo: sabado, pm )
+UPDATE clean.datos_transitocdmx
+SET origen = NULL
+WHERE origen IN ('NA', 'N/A', 'SD', '', 'sábado', 'PM');
+
+-- Homologar la categoría 911: pues hay variantes inecesarias como "911CDMX" o "LLAMADA A 911"
+UPDATE clean.datos_transitocdmx
+SET origen = 'BOTON DE AUXILIO'
+WHERE origen IN ('BOTÓN DE AUXILIO','BOTON DE AUXILIO','MI CALLE(BOTON)','MI C911E', 'MI CALLE'); --DOMDOM: LO QUE ENTENDÍ ES QUE CUANDO DICEN MI CALLE SE REFIERE AL BOTON ASI QUE HOMOLOGUE
+
+-- Homologar variantes de camara / cámara
+UPDATE clean.datos_transitocdmx
+SET origen = 'CAMARA'
+WHERE origen IN ('CÁMARA','CAMARA');
+
+-- Homologar variantes relacionadas con 911.
+-- Aquí dejamos LLAMADA DEL 911 separada de 911 CDMX, porque la llamada pudo realizarse fuera de la ciudad.
+UPDATE clean.datos_transitocdmx
+SET origen = '911 CDMX'
+WHERE origen IN ('911CDMX','APP 911CDMX','911 CDMX CHAT');
+
+
+-- Homologar redes sociales.
+UPDATE clean.datos_transitocdmx
+SET origen = 'REDES SOCIALES'
+WHERE origen IN ('REDES','REDES SOCIALES');
+
+
+-- Homologar errores por tilde en policía.
+UPDATE clean.datos_transitocdmx
+SET origen = 'MI POLICIA NEGOCIO'
+WHERE origen IN ('MI POLICIA NEGOCIO','MI POLICÍA NEGOCIO');
+
+
+-- Verificación (sirve para ver si la columna de origen está limpia
+SELECT origen, COUNT(*) AS total
+FROM clean.datos_transitocdmx
+GROUP BY origen
+ORDER BY total DESC;
+
 
 
 --Inconsistencias y datos raros en tipo_interseccion
