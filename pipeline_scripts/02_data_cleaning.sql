@@ -197,8 +197,16 @@ UPDATE clean.datos_transitocdmx
 SET interseccion_semaforizada =  'NO'
 WHERE interseccion_semaforizada ILIKE '%N%';
 
---Nullificar sentidos de circulación ambiguos y corregir Typo
+-- ATRIBUTO: sentido_de_circulacion
+-- Verificación (sirve para ver si la columna de sentido_de_circulacion está limpia)
+SELECT sentido_de_circulacion, COUNT(*) AS total
+FROM clean.datos_transitocdmx
+GROUP BY sentido_de_circulacion
+ORDER BY total DESC;
+   
+   
 
+--Nullificar sentidos de circulación ambiguos y corregir Typo
 UPDATE clean.datos_transitocdmx
 SET sentido_de_circulacion = 'P-O'
 WHERE sentido_de_circulacion LIKE 'P O';
@@ -206,6 +214,19 @@ WHERE sentido_de_circulacion LIKE 'P O';
 UPDATE clean.datos_transitocdmx
 SET sentido_de_circulacion = NULL
 WHERE sentido_de_circulacion IN ('N', 'NO', 'PO');
+
+
+-- ATRIBUTO: alcaldia
+-- Verificación (sirve para ver si la columna de alcaldia está limpia)
+SELECT alcaldia, COUNT(*) AS total
+FROM clean.datos_transitocdmx
+GROUP BY alcaldia
+ORDER BY total DESC;
+
+
+SELECT colonia
+FROM clean.datos_transitocdmx
+WHERE alcaldia = 'AV INSURGENTES';
 
 -- Gustavo A Madero está repetido
 UPDATE clean.datos_transitocdmx
@@ -215,3 +236,150 @@ WHERE alcaldia = 'GUSTAVO A. MADERO';
 UPDATE clean.datos_transitocdmx
 SET alcaldia = 'CUAUHTEMOC'
 WHERE alcaldia = 'AV INSURGENTES';
+
+
+
+-- ATRIBUTO: unidad_medica_de_apoyo
+-- Verificación (sirve para ver si la columna de unidad_medica_de_apoyo está limpia)
+SELECT zona_vial, COUNT(*) AS total
+FROM clean.datos_transitocdmx
+GROUP BY zona_vial
+ORDER BY total DESC;
+
+
+
+SELECT DISTINCT unidad_a_cargo
+FROM clean.datos_transitocdmx
+WHERE unidad_a_cargo NOT SIMILAR TO ('%MX%');
+
+
+
+-- ATRIBUTO: sector
+-- Verificación (sirve para ver si la columna de sector está limpia)
+SELECT sector, COUNT(*) AS total
+FROM clean.datos_transitocdmx
+GROUP BY sector
+ORDER BY total DESC;
+
+--LIMPIEZA GENERAL DE DATOS
+--Reemplazo de tildes, borramos espacios inecesarios, pasamos todo a mayúsculas
+UPDATE clean.datos_transitocdmx
+SET sector = UPPER(TRIM(TRANSLATE(sector, 'ÁÉÍÓÚáéíóú', 'AEIOUaeiou')));
+
+--Corregimos los typos observados de los sectores y los agrupamos a su correspondiente valor
+START TRANSACTION;
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'TLATELOLCO'
+WHERE sector IN ('TLALTELOLCO', 'TLATALOLCO');
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'ABASTO REFORMA'
+WHERE sector IN (
+    'ABASTOS REFORMA',
+    'ABASTO-REFORMA',
+    'REFORMA ABASTOS',
+    'REFORMA ABASTO',
+    'ABASTO/REFORMA',
+    'BASTO REFORMA',
+    'ABSTO REFORMA',
+    'ABASTO REFORMS',
+    'ABASTO REFROMA'
+);
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'NARVARTE ALAMOS'
+WHERE sector IN (
+    'NARVATE ALAMO',
+    'NARVARTE ALAMO',
+    'NARVATE ALAMOS', 'NARVANTE'
+);
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'HUIPULCO HOSPITALES'
+WHERE sector IN (
+    'HUIPULCO-HOSPITALES',
+    'HIUPULCO HOSPITALES'
+);
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'IZTACCIHUATL'
+WHERE sector IN (
+    'IZTACCIHUAT',
+    'IZTACCIHUAL',
+    'IZACCIHUATL',
+    'IZACIHUATL',
+    'AZTACCIHUATL',
+    'IZTACCIHIATL'
+);
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'PANTITLAN'
+WHERE sector = 'PATITLAN';
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'PLATEROS'
+WHERE sector = 'PALTEROS';
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'CLAVERIA'
+WHERE sector = 'CALVERIA';
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'COYOACAN'
+WHERE sector = 'COYOACON';
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'DEL VALLE'
+WHERE sector = 'DEL VALE';
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'BUENAVISTA'
+WHERE sector = 'BUENA VISTA';
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'PORTALES'
+WHERE sector = 'PORTLES';
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'TOPILEJO'
+WHERE sector = 'TIPOLEJO';
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'TAXQUEÑA'
+WHERE sector IN ('TAXQUENA', 'TAXQUEÑES');
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'TEPEYAC'
+WHERE sector IN ('TEPAYAC', 'TEPEYA');
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'MIXQUIC'
+WHERE sector = 'MIXQUI';
+
+UPDATE clean.datos_transitocdmx
+SET sector = 'GRANJAS'
+WHERE sector IN ('GRANJA', 'GRNAJAS');
+
+UPDATE clean.datos_transitocdmx
+SET sector = NULL
+WHERE sector = 'SD';
+
+-- COMMIT;
+-- ROLLBACK;
+
+--Se corrigieron únicamente errores ortográficos evidentes en sectores policiales. Categorías raras o de baja frecuencia se conservaron para evitar introducir agrupaciones artificiales o perder info.
+
+/*
+COMENTARIO AL MARGEN (BORRAR DESPUES):
+FALTAN POR LIMPIAR: COLONIA, UNIDAD A CARGO Y UNIDAD MEDICA
+
+COLONIA ES LA MAS DIFICIL DE LIMPIAR: INFO MUY PARECIDA PERO DEMASIADAS VARIACIONES DE ELLA COMO PARA PONER ENLISTAR.
+UNIDAD MEDICA: DEMASIADAS VARIANTES DE CRUZ ROJA Y ERUM A VECES ESTAN AMBAS JUNTAS Y LAS VARACIONES SON MUCHAS PARA PODERSE ENLISTAR, TAMPOCO SE SABE LA REPERCUSIÓN DE
+-- MODIFICAR ESOS DATOS Y ORGANIZARLOS EN UN TIPO PARTICULAR
+UNIDAD A CARGO: VARIAS UNIDADES NO TIENEN SENTIDO O MANEJAN ABREVIACIONES NO COMPRENSIBLES
+
+*/
+
+
+
