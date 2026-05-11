@@ -38,9 +38,18 @@ ORDER BY total DESC;
 --En origen hay datos raros como sábado, inconsistencias por tildes en las palabras policía, cámara y botón. Dice MI C4LLE en vez de MI CALLE
 
 --LIMPIEZA GENERAL DE DATOS
---Reemplazo de tildes, borramos espacios inecesarios, pasamos todo a mayúsculas
+--Borramos espacios innecesarios y pasamos todo a mayúsculas
 UPDATE clean.datos_transitocdmx
-SET origen = UPPER(TRIM(TRANSLATE(origen, 'ÁÉÍÓÚáéíóú', 'AEIOUaeiou')));
+SET origen = UPPER(TRIM(origen));
+
+-- Homologar variantes con tilde
+UPDATE clean.datos_transitocdmx
+SET origen = 'POLICIA'
+WHERE origen = 'POLICÍA';
+
+UPDATE clean.datos_transitocdmx
+SET origen = 'CAMARA'
+WHERE origen = 'CÁMARA';
 
 -- Homologar variantes relacionadas con 911.
 -- Aquí dejamos LLAMADA DEL 911 separada de 911 CDMX.
@@ -56,6 +65,7 @@ START TRANSACTION;
 UPDATE clean.datos_transitocdmx
 SET origen = 'BOTON DE AUXILIO'
 WHERE origen ILIKE '%BOTON%'
+   OR origen ILIKE '%BOTÓN%'
    OR origen ILIKE '%AUXILIO%';
 COMMIT;
 
@@ -262,9 +272,9 @@ GROUP BY sector
 ORDER BY total DESC;
 
 --LIMPIEZA GENERAL DE DATOS
---Reemplazo de tildes, borramos espacios inecesarios, pasamos todo a mayúsculas
+--Borramos espacios innecesarios y pasamos todo a mayúsculas
 UPDATE clean.datos_transitocdmx
-SET sector = UPPER(TRIM(TRANSLATE(sector, 'ÁÉÍÓÚáéíóú', 'AEIOUaeiou')));
+SET sector = UPPER(TRIM(sector));
 
 --Corregimos los typos observados de los sectores y los agrupamos a su correspondiente valor
 START TRANSACTION;
@@ -347,7 +357,7 @@ WHERE sector = 'TIPOLEJO';
 
 UPDATE clean.datos_transitocdmx
 SET sector = 'TAXQUEÑA'
-WHERE sector IN ('TAXQUENA', 'TAXQUEÑES');
+WHERE sector IN ('TAXQUENA', 'TAXQUEÑES', 'TAXQUEÑA');
 
 UPDATE clean.datos_transitocdmx
 SET sector = 'TEPEYAC'
