@@ -1,6 +1,6 @@
 --Creamos esquema para limpiar los datos
-CREATE SCHEMA clean;
 DROP SCHEMA IF EXISTS clean CASCADE;
+CREATE SCHEMA clean;
 
 --Duplicamos la tabla raw
 CREATE TABLE clean.datos_transitocdmx
