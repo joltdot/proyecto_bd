@@ -254,16 +254,28 @@ comando en `psql`:
 ```
 
 **Desglose de limpieza de datos:**
-| Atributo(s) | Operación(es) | Observación  |
-|-------------|---------------|--------------|
-| `fecha_evento`, `fecha_captura` | `UPDATE` | En algunos casos, para `fecha_captura`, el mes y el día estaban intercambiados. Para este mismo atributo, había tuplas con año incorrecto. Además, había tuplas con ambos atributos intercambiados. |
-| `dia`  | `DROP COLUMN`  | Ya está implícito en los atributos de fecha, si llega a ser necesario se extraerá de estos. |
-| `tipo_de_interseccion` | `UPDATE`, `RENAME COLUMN` | Inconsistencias en el nombre de intersecciones. Se renombró a `intersección` para facilidad de manipulación. |
-| `clasificacion_de_la_vialidad` | `UPDATE`, `RENAME COLUMN` |  Inconsistencias en la clasificación de vialidades. Se renombró a `vialidad` para facilidad de manipulación.|
-| `sentido_de_circulación` | `UPDATE` |  Corrección de inconsistencias y nullificación de valores ambiguos. |
-| `alcaldía` | `UPDATE` | Correción de inconsistencias en valores de alcaldías. |
-| `origen` | `UPDATE` | Inconsistencias por errores de ortografía o typos |
-| `matricula_unidad_medica` | `DROP COLUMN` | Columna irrelevante |
+| Atributo(s) | Operación(es) | Justificación | Observación  |
+|-------------|---------------|---------------|--------------|
+| `fecha_evento`, `fecha_captura` | `UPDATE` | Se detectaron 9,221 registros donde `fecha_captura < fecha_evento`, lo cual es lógicamente imposible (no se puede capturar un evento antes de que ocurra). El patrón (no hay ninguna ocurrencia donde día sea mayor a 12) sugiere intercambiar día/mes en el parseo original. | Se corrigió la inversión día/mes, se arregló el año incorrecto en un subconjunto de tuplas y se intercambiaron las fechas en los casos donde ambas estaban invertidas. |
+| `dia`  | `DROP COLUMN`  | El día de la semana ya está implícito en `fecha_evento`. Mantenerlo introduce redundancia y riesgo de inconsistencia. | Si llega a ser necesario se extraerá de `fecha_evento`. |
+| `tipo_de_interseccion` | `UPDATE` | `RENAME COLUMN` | Se encontraron valores inconsistentes: "AJUSCO" (verificado en Maps como intersección tipo T) y "CRUZO" (typo de "CRUZ"), se renombró a `intersección` para facilidad de manipulación. | Se corrigieron los valores erróneos a sus equivalentes correctos. |
+| `clasificacion_de_la_vialidad` | `UPDATE` | `RENAME COLUMN` | Existía duplicación por diferencia de espaciado: "EJEVIAL" vs "EJE VIAL", se renombró a `vialidad` para facilidad de manipulación.. | Se homologó a "EJE VIAL". |
+| `interseccion_semaforizada` | `UPDATE` | Existían valores "N" que debían ser "NO" para mantener consistencia con el dominio SI/NO del atributo. | Se homologó "N" a "NO". |
+| `sentido_de_circulacion` | `UPDATE` |  Se encontraron typos ("P O" en vez de "P-O") y valores ambiguos ("N", "NO", "PO") que no representan sentidos cardinales válidos. | Corrección de escritura y nullificación de valores ambiguos. |
+| `alcaldia` | `UPDATE` | Se detectaron 18 valores únicos cuando la CDMX solo tiene 16 alcaldías. "GUSTAVO A. MADERO" duplicaba a "GUSTAVO A MADERO" y "AV INSURGENTES" no es una alcaldía (la colonia asociada pertenece a Cuauhtémoc). | Se homologaron ambos casos a sus valores correctos. |
+| `origen` | `UPDATE` | Se encontraron inconsistencias por tildes ("POLICÍA"/"POLICIA", "CÁMARA"/"CAMARA", "BOTÓN"/"BOTON"), variantes de 911 dispersas, y valores sin sentido como "SABADO". | Se homologaron variantes con tilde, se agruparon categorías de 911 y botón de auxilio, se nullearon valores sin sentido y se agruparon categorías con menos de 10 ocurrencias en "OTROS". |
+| `sector` | `UPDATE` | Se encontraron múltiples errores ortográficos en nombres de sectores policiales ("TLALTELOLCO", "PALTEROS", "CALVERIA") y variantes de escritura para un mismo sector (9 variantes de "ABASTO REFORMA"). | Se corrigieron errores ortográficos evidentes. Categorías raras o de baja frecuencia se conservaron para evitar agrupaciones artificiales. Se nulleó "SD" (sin dato). |
+| `matricula_unidad_medica` | `DROP COLUMN` | 82,187 nulos de 134,079 registros y no aporta valor analítico al estudio de patrones de accidentalidad. | Eliminada. |
+
+**Atributos no limpiados (decisión consciente):**
+
+Los siguientes atributos presentan inconsistencias pero se decidió no modificarlos por el riesgo de introducir agrupaciones incorrectas:
+
+| Atributo | Justificación de no intervención |
+|----------|----------------------------------|
+| `colonia` | Presenta más de 4,250 valores únicos con variaciones sutiles de escritura (abreviaciones, tildes, espacios). La homologación automatizada requeriría una fuente externa de referencia y una agrupación manual podría llevar a pérdida de información. |
+| `unidad_a_cargo` | Contiene matrículas de unidades policiales con abreviaciones internas no documentadas. Sin un catálogo oficial, cualquier modificación podría alterar información. |
+| `unidad_medica_de_apoyo` | Presenta múltiples variantes de instituciones (CRUZ ROJA, ERUM) combinadas con identificadores específicos. |
 
 ## Normalización
 
