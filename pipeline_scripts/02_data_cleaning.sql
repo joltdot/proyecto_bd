@@ -29,6 +29,11 @@ DROP COLUMN matricula_unidad_medica;
 ALTER TABLE clean.datos_transitocdmx
 DROP COLUMN folio;
 
+--ZONA VIAL: Entero del 1 al 6 sin documentación oficial sobre su significado. No es posible analizar un atributo cuya semántica se desconoce.
+
+ALTER TABLE clean.datos_transitocdmx
+DROP COLUMN zona_vial;
+
 
 --DEPURACIÓN DE ATRIBUTOS SUCIOS
 
