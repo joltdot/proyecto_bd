@@ -362,7 +362,6 @@ erDiagram
     ubicacion ||--|{ accidente : " "
     reporte || -- |{ accidente : " "
     alcaldia ||--|{ colonia : " "
-    vialidad  ||--o| colonia : " "
     vialidad ||--o| interseccion : " "
     vialidad ||--|| ubicacion : " "
     
