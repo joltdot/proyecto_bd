@@ -101,6 +101,7 @@ SELECT DISTINCT TRIM(LOWER(sentido_de_circulacion))
 FROM clean.datos_transitocdmx
 WHERE sentido_de_circulacion IS NOT NULL;
 
+/*
    --Tabla: vialidad
 
 CREATE TABLE normalization.vialidad (
@@ -116,8 +117,22 @@ FROM (
     SELECT punto_2 FROM clean.datos_transitocdmx
 ) 
 WHERE nombre IS NOT NULL;
+*/
 
-   --Tabla: accidente (TABLA CENTRAL)
+   	--Intersección semaforizada
+
+CREATE TABLE normalization.interseccion_semaforizada (
+    id BIGSERIAL PRIMARY KEY,
+    nombre VARCHAR(5) NOT NULL UNIQUE
+);
+
+INSERT INTO normalization.interseccion_semaforizada (nombre)
+SELECT DISTINCT TRIM(LOWER(interseccion_semaforizada))
+FROM clean.datos_transitocdmx
+WHERE interseccion_semaforizada IS NOT NULL;
+
+
+	--Tabla: accidente
 
 DROP TABLE IF EXISTS normalization.accidente CASCADE;
 
@@ -129,6 +144,7 @@ CREATE TABLE normalization.accidente (
 
     fecha_evento DATE,
     hora_evento TIME,
+    fecha_captura DATE,
 
     personas_fallecidas INTEGER,
     personas_lesionadas INTEGER,
@@ -143,23 +159,44 @@ CREATE TABLE normalization.accidente (
     tipo_interseccion_id BIGINT,
     clasificacion_vialidad_id BIGINT,
     sentido_circulacion_id BIGINT,
+    interseccion_semaforizada_id BIGINT,
 
-    FOREIGN KEY (colonia_id) REFERENCES normalization.colonia(id),
-    FOREIGN KEY (tipo_evento_id) REFERENCES normalization.tipo_evento(id),
-    FOREIGN KEY (origen_id) REFERENCES normalization.origen(id),
-    FOREIGN KEY (sector_id) REFERENCES normalization.sector(id),
-    FOREIGN KEY (tipo_interseccion_id) REFERENCES normalization.tipo_interseccion(id),
-    FOREIGN KEY (clasificacion_vialidad_id) REFERENCES normalization.clasificacion_vialidad(id),
-    FOREIGN KEY (sentido_circulacion_id) REFERENCES normalization.sentido_circulacion(id)
+    FOREIGN KEY (colonia_id)
+        REFERENCES normalization.colonia(id),
+
+    FOREIGN KEY (tipo_evento_id)
+        REFERENCES normalization.tipo_evento(id),
+
+    FOREIGN KEY (origen_id)
+        REFERENCES normalization.origen(id),
+
+    FOREIGN KEY (sector_id)
+        REFERENCES normalization.sector(id),
+
+    FOREIGN KEY (tipo_interseccion_id)
+        REFERENCES normalization.tipo_interseccion(id),
+
+    FOREIGN KEY (clasificacion_vialidad_id)
+        REFERENCES normalization.clasificacion_vialidad(id),
+
+    FOREIGN KEY (sentido_circulacion_id)
+        REFERENCES normalization.sentido_circulacion(id),
+
+    FOREIGN KEY (interseccion_semaforizada_id)
+        REFERENCES normalization.interseccion_semaforizada(id)
 );
+
 
 INSERT INTO normalization.accidente (
     latitud,
     longitud,
     fecha_evento,
     hora_evento,
+    fecha_captura,
+
     personas_fallecidas,
     personas_lesionadas,
+
     prioridad,
     trasladado_lesionados,
 
@@ -169,15 +206,20 @@ INSERT INTO normalization.accidente (
     sector_id,
     tipo_interseccion_id,
     clasificacion_vialidad_id,
-    sentido_circulacion_id
+    sentido_circulacion_id,
+    interseccion_semaforizada_id
 )
+
 SELECT
     d.latitud,
     d.longitud,
     d.fecha_evento,
     d.hora_evento,
+    d.fecha_captura,
+
     d.personas_fallecidas,
     d.personas_lesionadas,
+
     d.prioridad,
     d.trasladado_lesionados,
 
@@ -187,7 +229,8 @@ SELECT
     s.id,
     ti.id,
     cv.id,
-    sc.id
+    sc.id,
+    isem.id
 
 FROM clean.datos_transitocdmx d
 
@@ -214,9 +257,13 @@ LEFT JOIN normalization.clasificacion_vialidad cv
     ON TRIM(LOWER(d.clasificacion_de_la_vialidad)) = cv.nombre
 
 LEFT JOIN normalization.sentido_circulacion sc
-    ON TRIM(LOWER(d.sentido_de_circulacion)) = sc.nombre;    
-    
+    ON TRIM(LOWER(d.sentido_de_circulacion)) = sc.nombre
+
+LEFT JOIN normalization.interseccion_semaforizada isem
+    ON TRIM(LOWER(d.interseccion_semaforizada)) = isem.nombre;
+
+
 --PRUEBA
+
 SELECT COUNT(*)
 FROM normalization.accidente;
-
