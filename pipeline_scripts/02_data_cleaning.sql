@@ -23,6 +23,11 @@ ALTER TABLE clean.datos_transitocdmx
 
 ALTER TABLE clean.datos_transitocdmx
 DROP COLUMN matricula_unidad_medica;
+
+--FOLIO: No funciona como llave primaria (7,288 registros con "SD" y folios repetidos). Es un identificador administrativo que no aporta al análisis de patrones de accidentalidad.
+
+ALTER TABLE clean.datos_transitocdmx
+DROP COLUMN folio;
     
 -- FOLIO: El valor de este atributo no contribuye al análisis del proyecto.
 ALTER TABLE clean.datos_transitocdmx
