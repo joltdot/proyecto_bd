@@ -286,8 +286,77 @@ normalización se puede emplear el siguiente comando en `psql`:
 \i pipeline_scripts/03_data_normalization.sql
 ```
 
->  Aquí es una buena sección para documentar la descomposición intuitiva de las tablas.
-> También un ERD del diseño final debe ser incluido.
 
+## Normalización del dataset de incidentes viales (CDMX)
+
+El proceso de normalización transforma el conjunto de datos original en un modelo relacional estructurado, eliminando redundancia y asegurando consistencia mediante la separación de atributos categóricos en catálogos independientes.
+Esta es una normalización intuitiva, por lo que no forzosamente está en FNBC o 4FN.
+
+---
+
+## Estructura general del modelo
+
+El modelo se organiza en:
+
+### Entidad central (hechos)
+- `accidente`
+
+**Justificación:**
+Representa el evento principal del sistema (incidente vial). Se mantiene como tabla central porque concentra las variables cuantitativas y temporales del fenómeno. Todas las demás entidades se relacionan con esta tabla.
+
+---
+
+### Dimensiones geográficas
+- `alcaldia`
+- `colonia`
+
+**Justificación:**
+Se separan debido a que representan una estructura jerárquica y altamente repetitiva dentro de los registros.
+- Permite análisis geoespacial consistente.
+- Evita la duplicación de nombres de ubicación en cada incidente.
+- Una alcaldía puede contener múltiples colonias (relación 1:N). Se implementa mediante:
+  ```{psql}
+  AND c.alcaldia_id = a.id
+  ```
+
+---
+
+### Relaciones respecto a la clasificación del evento
+- `tipo_evento`
+- `tipo_interseccion`
+- `clasificacion_vialidad`
+- `sentido_circulacion`
+
+**Justificación:**
+Se modelan como catálogos independientes porque:
+- Tienen un conjunto limitado de valores posibles.
+- Se repiten constantemente en los registros.
+- Separarlos evita inconsistencias de escritura y facilita la estandarización del análisis.
+
+---
+
+### Catálogos operativos
+- `origen`
+- `sector`
+
+**Justificación:**
+Estos atributos describen la operación del sistema de atención del incidente.
+- Representan entidades administrativas o de respuesta.
+- Su normalización permite mantener consistencia en la captura de datos.
+- Facilita análisis sobre eficiencia y cobertura operativa.
+
+---
+
+### Infraestructura vial
+- `vialidad (compuesta por las columnas punto_1 y punto_2)`
+
+**Justificación:**
+Se define a partir de dos atributos del dataset original que representan referencias espaciales del incidente.
+- Se unifican para evitar duplicación de nombres de calles o avenidas.
+- Facilita futuros análisis de intersecciones y relaciones espaciales entre vías.
+
+---
+
+> También un ERD del diseño final debe ser incluido.
 
 
