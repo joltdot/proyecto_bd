@@ -359,46 +359,48 @@ Se define a partir de dos atributos del dataset original que representan referen
 
 ```mermaid
 erDiagram
-    evento {
-        bigint id
+    ubicacion ||--|{ accidente : " "
+    accidente {
+        bigint id PK
         varchar(32) tipo
         smallint no_lesionados
         smallint no_fallecidos
-        bigint ubicacion_id
-        bigint reporte_id
+        bigint ubicacion_id FK
+        bigint reporte_id FK
     }
     alcaldia {
-        bigint id
+        bigint id PK
         varchar(32) nombre
     }
     colonia {
-        bigint id
+        bigint id PK
         varchar(32) colonia
     }
     interseccion {
-        bigint id
+        bigint id PK
         varchar(16) tipo
-        varchar(32) punto_1
-        varchar(32) punto_2
+        varchar(32) calle_1
+        varchar(32) calle_2
         varchar(5) sentido_circulacion
         bool semaforizada
     }
     vialidad {
-        bigint id
+        bigint id PK
         varchar(16) clasificacion
-        smallint zona
+        varchar(32) calle
+        bigint interseccion_id FK
     }
     ubicacion {
         bigint id
         float latitud
         float longitud
-        bigint alcaldia_id
-        bigint colonia_id
-        bigint vialidad_id
+        bigint alcaldia_id FK
+        bigint colonia_id FK
+        bigint vialidad_id fk
         
     }
     reporte {
-        bigint id
+        bigint id PK
         varchar(32) origen
         varchar(32) sector
         varchar(5) prioridad
