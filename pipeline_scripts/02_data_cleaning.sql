@@ -388,17 +388,6 @@ COMMIT;
 
 --Se corrigieron únicamente errores ortográficos evidentes en sectores policiales. Categorías raras o de baja frecuencia se conservaron para evitar introducir agrupaciones artificiales o perder info.
 
-/*
-COMENTARIO AL MARGEN (BORRAR DESPUES):
-FALTAN POR LIMPIAR: COLONIA, UNIDAD A CARGO Y UNIDAD MEDICA
-
-COLONIA ES LA MAS DIFICIL DE LIMPIAR: INFO MUY PARECIDA PERO DEMASIADAS VARIACIONES DE ELLA COMO PARA PONER ENLISTAR.
-UNIDAD MEDICA: DEMASIADAS VARIANTES DE CRUZ ROJA Y ERUM A VECES ESTAN AMBAS JUNTAS Y LAS VARACIONES SON MUCHAS PARA PODERSE ENLISTAR, TAMPOCO SE SABE LA REPERCUSIÓN DE
--- MODIFICAR ESOS DATOS Y ORGANIZARLOS EN UN TIPO PARTICULAR
-UNIDAD A CARGO: VARIAS UNIDADES NO TIENEN SENTIDO O MANEJAN ABREVIACIONES NO COMPRENSIBLES
-
-*/
-
 ALTER TABLE clean.datos_transitocdmx
 ADD COLUMN geom geometry(Point, 4326);
 UPDATE clean.datos_transitocdmx
@@ -407,6 +396,7 @@ WHERE geom IS NULL;
 
 
 --
+--Ignorar por ahora
 -- UPDATE clean.datos_transitocdmx
 -- SET colonia = c.nomdt
 -- FROM clean.colonia_geometria AS c
