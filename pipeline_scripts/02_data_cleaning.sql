@@ -28,10 +28,6 @@ DROP COLUMN matricula_unidad_medica;
 
 ALTER TABLE clean.datos_transitocdmx
 DROP COLUMN folio;
-    
--- FOLIO: El valor de este atributo no contribuye al análisis del proyecto.
-ALTER TABLE clean.datos_transitocdmx
-DROP COLUMN folio;
 
 
 --DEPURACIÓN DE ATRIBUTOS SUCIOS
