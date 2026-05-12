@@ -357,6 +357,53 @@ Se define a partir de dos atributos del dataset original que representan referen
 
 ---
 
-> También un ERD del diseño final debe ser incluido.
+```mermaid
+erDiagram
+    evento {
+        bigint id
+        varchar(32) tipo
+        smallint no_lesionados
+        smallint no_fallecidos
+        bigint ubicacion_id
+        bigint reporte_id
+    }
+    alcaldia {
+        bigint id
+        varchar(32) nombre
+    }
+    colonia {
+        bigint id
+        varchar(32) colonia
+    }
+    interseccion {
+        bigint id
+        varchar(16) tipo
+        varchar(32) punto_1
+        varchar(32) punto_2
+        varchar(5) sentido_circulacion
+        bool semaforizada
+    }
+    vialidad {
+        bigint id
+        varchar(16) clasificacion
+        smallint zona
+    }
+    ubicacion {
+        bigint id
+        float latitud
+        float longitud
+        bigint alcaldia_id
+        bigint colonia_id
+        bigint vialidad_id
+        
+    }
+    reporte {
+        bigint id
+        varchar(32) origen
+        varchar(32) sector
+        varchar(5) prioridad
+    }
+
+```
 
 
