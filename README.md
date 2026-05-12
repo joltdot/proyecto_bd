@@ -373,6 +373,7 @@ erDiagram
     accidente {
         bigint id PK
         varchar(32) tipo
+        timestamp fecha
         smallint no_lesionados
         smallint no_fallecidos
         bigint ubicacion_id FK 
@@ -407,10 +408,10 @@ erDiagram
         float longitud
         bigint colonia_id FK 
         bigint vialidad_id FK 
-        
     }
     reporte {
         bigint id PK
+        timestamp fecha
         varchar(32) origen
         varchar(32) sector
         varchar(5) prioridad
