@@ -356,24 +356,26 @@ Se define a partir de dos atributos del dataset original que representan referen
 - Se unifican para evitar duplicación de nombres de calles o avenidas.
 - Facilita futuros análisis de intersecciones y relaciones espaciales entre vías.
 
+## ERD
+A partir de lo anterior, se realizó el siguiente diagrama
+```mermaid
+---
+title: vialcdmx
 ---
 
-```mermaid
 erDiagram
     ubicacion ||--|{ accidente : " "
     reporte || -- |{ accidente : " "
     alcaldia ||--|{ colonia : " "
+    ubicacion ||--|| colonia : " "
     vialidad ||--o| interseccion : " "
     vialidad ||--|| ubicacion : " "
-    
-    
-    
     accidente {
         bigint id PK
         varchar(32) tipo
         smallint no_lesionados
         smallint no_fallecidos
-        bigint ubicacion_id FK
+        bigint ubicacion_id FK 
         bigint reporte_id FK
     }
     alcaldia {
@@ -396,15 +398,15 @@ erDiagram
     vialidad {
         bigint id PK
         varchar(16) clasificacion
-        varchar(32) calle
-        bigint interseccion_id FK
+        varchar(32) calle 
+        bigint interseccion_id FK 
     }
     ubicacion {
         bigint id PK
         float latitud
         float longitud
-        bigint colonia_id FK
-        bigint vialidad_id FK
+        bigint colonia_id FK 
+        bigint vialidad_id FK 
         
     }
     reporte {
@@ -416,8 +418,7 @@ erDiagram
 
 ```
 
------
------
+---
 # Shapefile
 Primero, desde la terminal en postgres hay que correr `SELECT * FROM pg_available_extensions WHERE name = 'postgis';`
 Si no existe la extensión, hay que instalarla siguiendo los pasos de [este link](https://postgis.net/documentation/getting_started/).
