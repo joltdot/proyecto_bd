@@ -357,7 +357,6 @@ Se define a partir de dos atributos del dataset original que representan referen
 - Facilita futuros análisis de intersecciones y relaciones espaciales entre vías.
 
 ## ERD
-A partir de lo anterior, se realizó el siguiente diagrama
 ```mermaid
 ---
 title: vialcdmx
@@ -417,6 +416,7 @@ erDiagram
     }
 
 ```
+> Para facilitar la visualización de este diagrama en el README, se utilizó Mermaid al ser la única opción disponible para este propósito. Sin embargo, esta plataforma no permite ajustar el origen y destino (de qué atributo sale y a cuál llega) de las cardinalidades.
 
 ---
 # Shapefile
