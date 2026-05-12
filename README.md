@@ -360,6 +360,14 @@ Se define a partir de dos atributos del dataset original que representan referen
 ```mermaid
 erDiagram
     ubicacion ||--|{ accidente : " "
+    reporte || -- |{ accidente : " "
+    alcaldia ||--|{ colonia : " "
+    vialidad  ||--o| colonia : " "
+    vialidad ||--o| interseccion : " "
+    vialidad ||--|| ubicacion : " "
+    
+    
+    
     accidente {
         bigint id PK
         varchar(32) tipo
@@ -375,6 +383,7 @@ erDiagram
     colonia {
         bigint id PK
         varchar(32) colonia
+        bigint alcaldia_id FK
     }
     interseccion {
         bigint id PK
@@ -391,12 +400,11 @@ erDiagram
         bigint interseccion_id FK
     }
     ubicacion {
-        bigint id
+        bigint id PK
         float latitud
         float longitud
-        bigint alcaldia_id FK
         bigint colonia_id FK
-        bigint vialidad_id fk
+        bigint vialidad_id FK
         
     }
     reporte {
