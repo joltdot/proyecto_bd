@@ -399,5 +399,26 @@ UNIDAD A CARGO: VARIAS UNIDADES NO TIENEN SENTIDO O MANEJAN ABREVIACIONES NO COM
 
 */
 
+ALTER TABLE clean.datos_transitocdmx
+ADD COLUMN geom geometry(Point, 4326);
+UPDATE clean.datos_transitocdmx
+SET geom = ST_Point(longitud, latitud, 4326)
+WHERE geom IS NULL;
 
 
+--
+-- UPDATE clean.datos_transitocdmx
+-- SET colonia = c.nomdt
+-- FROM clean.colonia_geometria AS c
+-- WHERE ST_Within(clean.datos_transitocdmx.geom, c.geom);
+--
+-- WITH  geometrias AS (
+--     SELECT geom
+--     FROM clean.colonia_geometria
+-- )
+-- SELECT *
+-- FROM clean.datos_transitocdmx
+-- WHERE NOT ST_Within(clean.datos_transitocdmx.geom, geometrias.geom);
+--
+-- SELECT DISTINCT colonia
+-- FROM clean.datos_transitocdmx;

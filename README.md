@@ -416,4 +416,16 @@ erDiagram
 
 ```
 
+-----
+-----
+# Shapefile
+Primero, desde la terminal en postgres hay que correr `SELECT * FROM pg_available_extensions WHERE name = 'postgis';`
+Si no existe la extensión, hay que instalarla siguiendo los pasos de [este link](https://postgis.net/documentation/getting_started/).
 
+Luego, desde la base de datos en la terminal hay que correr `CREATE EXTENSION postgis;`
+Para poder usarla.
+
+Después, desde la terminal hay que correr `shp2pgsql -s 4326 -I data/colonias_iecm.shp clean.colonia_geometria | psql -d vialcdmx`
+
+Aquí, 4326 es el sistema de coordenadas.
+Este comando crea una tabla nueva clean.colonia_geometria con los datos del shapefile en data.
