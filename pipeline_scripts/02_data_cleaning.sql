@@ -375,7 +375,7 @@ UPDATE clean.datos_transitocdmx
 SET sector = NULL
 WHERE sector = 'SD';
 
--- COMMIT;
+COMMIT;
 -- ROLLBACK;
 
 --Se corrigieron únicamente errores ortográficos evidentes en sectores policiales. Categorías raras o de baja frecuencia se conservaron para evitar introducir agrupaciones artificiales o perder info.
