@@ -91,21 +91,22 @@ El conjunto de datos contiene aproximadamente 134,079 registros anuales, con 26 
 El proyecto sigue una estructura modular para facilitar la reproducibilidad del pipeline de datos:
 
 ```
-├── README.md                                         <- Documentación para desarrolladores de este proyecto (i.e., reporte escrito)
+├── README.md                                         <- Documentación del proyecto (reporte escrito)
 ├── data
-│   ├── .gitignore
-│   └── raw_data.csv                                  <- Datos en formato CSV como vienen de la fuente original
+│   ├── raw_data.csv                                  <- Datos en formato CSV como vienen de la fuente original
+│   ├── colonias_iecm.shp/.shx/.dbf/.prj             <- Shapefile de colonias de la CDMX (IECM)
+│   └── *.png                                         <- Mapas generados por el script 05
 │
-├── pipeline_scripts                                  <- Scripts de SQL para ejecución del pipeline de datos
-│   ├── 01_raw_data_schema_creation_and_load.sql      <- Script de carga inicial (i.e., actividad B)
-│   ├── 02_data_cleaning.sql                          <- Script de limpieza de datos (i.e., actividad C)
-│   ├── 03_data_normalization.sql                     <- Script de normalización de relaciones (i.e., actividad D)
-│   └── 04_analytical_attributes_creation.sql         <- Script de creación de atributos analíticos (i.e., actividad E)
+├── pipeline_scripts                                  <- Scripts para ejecución del pipeline de datos
+│   ├── 01_raw_data_schema_creation_and_load.sql      <- Carga inicial (actividad B)
+│   ├── 02_data_cleaning.sql                          <- Limpieza de datos (actividad C)
+│   ├── 03_data_normalization.sql                     <- Normalización de relaciones (actividad D)
+│   ├── 04_analytical_attributes_creation.sql         <- Atributos analíticos y funciones de ventana (actividad E)
+│   ├── 05_georeferenced_maps.py                      <- Script Python de mapas (actividad E)
+│   └── 05_georeferenced_maps.ipynb                   <- Notebook con mapas ya renderizados (actividad E)
 │
 └── exploration_queries                               <- Scripts de SQL para exploración de datos
-    ├── 01_raw_data_exploration.sql                   <- Consultas de exploración de datos en bruto (i.e., soporte de actividad B)
-    ├── ⋅⋅⋅                                           <- Otras consultas en caso de ser requeridas
-    └── 0N_analytical_queries.sql                     <- Consultas de interés sobre los datos normalizados (i.e., soporte de actividad E)
+    └── 01_data_pre_analytics.sql                     <- Consultas de exploración de datos en bruto (soporte de actividad B)
 ```
 
 ### Requerimientos para replicación del proyecto
@@ -480,4 +481,96 @@ Para ejecutar el script de atributos analíticos:
 ```{psql}
 \i pipeline_scripts/04_analytical_attributes_creation.sql
 ```
+
+### Atributos analíticos y funciones de ventana
+
+El script 04 contiene tres bloques:
+
+**1. Queries descriptivas** — Análisis de frecuencia y cruces entre dimensiones:
+- Puntos críticos (lat/lon con más accidentes)
+- Distribución por hora, día de la semana, alcaldía
+- Factores de riesgo por alcaldía (vialidad × intersección × semáforo)
+- Tipos de accidente más frecuentes
+- Colonias con más lesionados
+- Intersecciones más peligrosas por fallecidos
+- Tiempo entre accidente y captura (máximo, mínimo, promedio)
+
+**2. Funciones de ventana:**
+
+| Query | Función | Propósito |
+|-------|---------|-----------|
+| Ranking de alcaldías | `RANK() OVER (ORDER BY ...)` | Ordenar alcaldías por total de accidentes |
+| Acumulado mensual | `SUM() OVER (ORDER BY mes)` | Running total de accidentes por mes |
+| Promedio por alcaldía vs individual | `AVG() OVER (PARTITION BY alcaldia)` | Comparar cada accidente contra el promedio de su alcaldía |
+| Diferencia entre horas | `LAG(col, 1) OVER (ORDER BY hora)` | Calcular cambio de accidentes entre horas consecutivas |
+| Cuartiles de riesgo | `NTILE(4) OVER (ORDER BY ...)` | Clasificar colonias en 4 grupos de riesgo |
+| Ranking por alcaldía | `DENSE_RANK() OVER (PARTITION BY alcaldia ...)` | Ranking de tipos de evento dentro de cada alcaldía |
+
+**3. Queries para georreferenciación:**
+- Coordenadas de todos los accidentes (mapa de calor)
+- Tasa de letalidad por colonia (mapa coropético)
+- Top 20 intersecciones no semaforizadas más peligrosas (petición de semaforización)
+- Accidentes diurnos vs nocturnos (comparativo)
+- Intersecciones no semaforizadas con accidentes nocturnos
+
+---
+
+### Visualización georreferenciada
+
+El script `05_georeferenced_maps.py` genera 5 mapas a partir de las queries del script 04, utilizando el shapefile de colonias como base geográfica.
+
+**Dependencias Python:**
+```bash
+pip install geopandas matplotlib contextily sqlalchemy psycopg2-binary
+```
+
+**Ejecución (desde `pipeline_scripts/`):**
+```bash
+python 05_georeferenced_maps.py
+```
+
+También existe el notebook `05_georeferenced_maps.ipynb` que contiene el mismo código dividido en celdas, con las gráficas ya renderizadas (una vez ejecutado) para revisión directa sin necesidad de correr el pipeline.
+
+**Mapas generados:**
+
+| # | Archivo | Descripción |
+|---|---------|-------------|
+| 1 | `mapa_calor_accidentes.png` | Densidad de accidentes como puntos superpuestos sobre basemap oscuro |
+| 2 | `mapa_coropletico_letalidad.png` | Colonias coloreadas por tasa de letalidad (fallecidos/accidentes, mín. 5 accidentes) |
+| 3 | `mapa_peticion_semaforos.png` | Top 20 intersecciones sin semáforo con más accidentes, con etiquetas |
+| 4 | `mapa_dia_vs_noche.png` | Panel comparativo: accidentes de día (7–19h) vs noche (19–7h), con intersecciones nocturnas sin semáforo resaltadas |
+
+Cada mapa incluye como comentario en el código la consulta SQL equivalente que genera los datos utilizados.
+
+**Nota:** El script asume una conexión PostgreSQL en `localhost:5432` con base de datos `vialcdmx` y usuario local sin contraseña. Ajustar la variable `ENGINE` en el script según el entorno local.
+
+---
+
+### Resultados del pipeline de mapas
+
+Al ejecutar el script 05, se obtuvieron los siguientes resultados:
+
+**Mapa 1 — Densidad de accidentes:** Se graficaron las coordenadas de todos los accidentes con geolocalización disponible. La concentración más alta se observa en el centro de la ciudad (alcaldías Cuauhtémoc, Benito Juárez y Venustiano Carranza).
+
+**Mapa 2 — Tasa de letalidad por colonia:** Se identificaron colonias con tasas de letalidad superiores al promedio, particularmente en la periferia (Tlalpan, Xochimilco, Milpa Alta) donde la infraestructura vial es menos desarrollada.
+
+**Mapa 3 — Petición de semaforización (Top 20 intersecciones no semaforizadas):**
+
+| Colonia | Alcaldía | Tipo | Accidentes | Lesionados |
+|---------|----------|------|-----------|------------|
+| San Andrés Totoltepec | Tlalpan | T | 17 | 31 |
+| San Miguel Xicalco | Tlalpan | Cruz | 17 | 21 |
+| Narvarte Pte | Benito Juárez | Cruz | 17 | 23 |
+| San Andrés Totoltepec | Tlalpan | Recta | 16 | 22 |
+| Ajusco | Coyoacán | Cruz | 16 | 18 |
+| Agrícola Pantitlán | Iztacalco | Recta | 15 | 21 |
+
+Tlalpan concentra 5 de las 20 intersecciones más peligrosas sin semáforo.
+
+**Mapa 4 — Tiempo de respuesta:** Se observa variabilidad en el tiempo promedio entre la ocurrencia del accidente y su captura en el sistema, con colonias periféricas tendiendo a tiempos mayores.
+
+**Mapa 5 — Día vs Noche:**
+- Accidentes diurnos (7:00–18:59): 80,789
+- Accidentes nocturnos (19:00–6:59): 48,270
+- El 37% de los accidentes ocurren de noche, con las intersecciones nocturnas sin semáforo más peligrosas ubicadas en San Pedro Mártir (Tlalpan, 8 acc.), Ajusco (Coyoacán, 6 acc.) y Agrícola Pantitlán (Iztacalco, 6 acc.).
 
