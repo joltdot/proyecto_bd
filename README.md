@@ -258,7 +258,8 @@ comando en `psql`:
 |-------------|---------------|---------------|--------------|
 | `fecha_evento`, `fecha_captura` | `UPDATE` | Se detectaron 9,221 registros donde `fecha_captura < fecha_evento`, lo cual es lógicamente imposible (no se puede capturar un evento antes de que ocurra). El patrón (no hay ninguna ocurrencia donde día sea mayor a 12) sugiere intercambiar día/mes en el parseo original. | Se corrigió la inversión día/mes, se arregló el año incorrecto en un subconjunto de tuplas y se intercambiaron las fechas en los casos donde ambas estaban invertidas. |
 | `dia`  | `DROP COLUMN`  | El día de la semana ya está implícito en `fecha_evento`. Mantenerlo introduce redundancia y riesgo de inconsistencia. | Si llega a ser necesario se extraerá de `fecha_evento`. |
-| `tipo_de_interseccion` | `UPDATE`, `RENAME COLUMN` | Se encontraron valores inconsistentes: "AJUSCO" (verificado en Maps como intersección tipo T) y "CRUZO" (typo de "CRUZ"), se renombró a `intersección` para facilidad de manipulación. Cuando el valor es "RECTO", no es una intersección. | Se corrigieron los valores erróneos a sus equivalentes correctos. Se nullificaron cuando este atributo es igual a "RECTA" |
+|`punto_1`, `punto_2` | `DROP COLUMN`| Hay 18866 valores únicos de mala calidad. La información que tenemos de `latitud` y `origen` es suficiente. | |
+| `tipo_de_interseccion` | `UPDATE`, `RENAME COLUMN` | Se encontraron valores inconsistentes: "AJUSCO" (verificado en Maps como intersección tipo T) y "CRUZO" (typo de "CRUZ"), se renombró a `intersección` para facilidad de manipulación. | Se corrigieron los valores erróneos a sus equivalentes correctos.|
 | `clasificacion_de_la_vialidad` | `UPDATE`, `RENAME COLUMN` | Existía duplicación por diferencia de espaciado: "EJEVIAL" vs "EJE VIAL", se renombró a `vialidad` para facilidad de manipulación.  | Se homologó a "EJE VIAL". |
 | `interseccion_semaforizada` | `UPDATE` | Existían valores "N" que debían ser "NO" para mantener consistencia con el dominio SI/NO del atributo. | Se homologó "N" a "NO". |
 | `sentido_de_circulacion` | `UPDATE` |  Se encontraron typos ("P O" en vez de "P-O") y valores ambiguos ("N", "NO", "PO") que no representan sentidos cardinales válidos. | Corrección de escritura y nullificación de valores ambiguos. |
@@ -389,22 +390,13 @@ erDiagram
         varchar(32) colonia
         bigint alcaldia_id FK
     }
-    interseccion {
-        bigint id PK
-        varchar(16) tipo
-        bigint calle_1_id
-        bigint calle_2_id
-        varchar(5) sentido_circulacion
-        bool semaforizada
-    }
-    calle {
-        bigint id PK
-        varchar(32) calle    
-    }
 
     vialidad {
         bigint id PK
         varchar(16) clasificacion
+        varchar(16) tipo_interseccion
+        varchar(16) sentido_circulacióm
+        bool interseccion_semaforizada
         bigint interseccion_id FK 
     }
     ubicacion {
