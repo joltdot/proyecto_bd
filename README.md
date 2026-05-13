@@ -370,8 +370,6 @@ erDiagram
     alcaldia ||--|{ colonia : " "
     colonia ||--o{ ubicacion : " "
     vialidad ||--o{ ubicacion : " "
-    vialidad ||--o| interseccion : " "
-    calle ||--|{ interseccion : " "
     accidente {
         bigint id PK
         varchar(32) tipo
