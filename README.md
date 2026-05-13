@@ -114,9 +114,10 @@ Para replicar este proyecto es necesario:
 
 1. Descargar los datos en bruto de acuerdo con la sección de **Fuente de datos**.
 2. Contar con PostgreSQL 16 o superior instalado.
-3. Crear una base de datos exclusiva para el proyecto.
-4. Contar con acceso a una terminal con `psql` o un cliente compatible (por ejemplo, TablePlus).
-5. Ejecutar los comandos desde la raíz del repositorio.
+3. Contar con la extensión PostGIS instalada (requerida por el script 04 para georreferenciación). Instrucciones de instalación: https://postgis.net/documentation/getting_started/
+4. Crear una base de datos exclusiva para el proyecto.
+5. Contar con acceso a una terminal con `psql` o un cliente compatible (por ejemplo, TablePlus).
+6. Ejecutar los comandos desde la raíz del repositorio.
 
 ## Carga inicial
 
@@ -350,13 +351,34 @@ Estos atributos describen la operación del sistema de atención del incidente.
 
 ---
 
-### Infraestructura vial
-- `vialidad (compuesta por las columnas punto_1 y punto_2)`
+## Dependencias funcionales y multivaluadas
 
-**Justificación:**
-Se define a partir de dos atributos del dataset original que representan referencias espaciales del incidente.
-- Se unifican para evitar duplicación de nombres de calles o avenidas.
-- Facilita futuros análisis de intersecciones y relaciones espaciales entre vías.
+A continuación se enlistan las dependencias funcionales (DF) y multivaluadas (DMV) no triviales identificadas en la relación universal `clean.datos_transitocdmx` (después de la etapa de limpieza).
+
+**Dependencias funcionales no triviales:**
+
+| # | Dependencia | Análisis |
+|---|-------------|------------|
+| 1 | `id → fecha_evento, hora_evento, tipo_evento, fecha_captura, latitud, longitud, colonia, alcaldia, sector, unidad_a_cargo, tipo_de_interseccion, interseccion_semaforizada, clasificacion_de_la_vialidad, sentido_de_circulacion, prioridad, origen, unidad_medica_de_apoyo, trasladado_lesionados, personas_fallecidas, personas_lesionadas` | La llave, al haber sido generada artificialmente, determina todos los atributos del registro. |
+| 2 | `colonia → alcaldia` | Una colonia pertenece a exactamente una alcaldía. Por lo que cada vez que se repite una colonia, se repite también la alcaldía, lo cual es redundante. |
+
+**Dependencias multivaluadas no triviales:**
+
+| # | Dependencia | Análisis |
+|---|-------------|------------|
+| 3 | `id ↠ tipo_evento` | Un incidente tiene un único tipo de evento, pero el tipo de evento es independiente de los atributos de espacio y tiempo.  |
+| 4 | `id ↠ origen` | El canal por el que se reporta un incidente es independiente de las características del evento (ubicación, tipo, severidad). |
+| 5 | `id ↠ sector` | El sector policial que atiende es independiente de las características del accidente en sí. Depende de los sectores policiales que no están delimitados por demarcaciones convencionales. |
+
+**Violación a FNBC:**
+
+- La DF #2 (`colonia → alcaldia`) viola FNBC porque `colonia` no es superllave de la relación. Esto justifica la descomposición en las tablas `alcaldia` y `colonia` (con `alcaldia_id` como FK en `colonia`).
+
+**Violaciones a 4FN:**
+
+- Las DMVs #3, #4 y #5 generan redundancia cuando se almacenan en una misma relación junto con los demás atributos. La separación en tablas `tipo_evento`, `origen`, `sector` con referencia por FK en `accidente` elimina esta redundancia.
+
+---
 
 ## ERD
 ```mermaid
@@ -436,14 +458,22 @@ erDiagram
 > Para facilitar la visualización de este diagrama en el README, se utilizó Mermaid al ser la única opción disponible para este propósito. Sin embargo, esta plataforma no permite ajustar el origen y destino (de qué atributo sale y a cuál llega) de las cardinalidades.
 
 ---
-# Shapefile
-Primero, desde la terminal en postgres hay que correr `SELECT * FROM pg_available_extensions WHERE name = 'postgis';`
-Si no existe la extensión, hay que instalarla siguiendo los pasos de [este link](https://postgis.net/documentation/getting_started/).
+## Georreferenciación (parte E)
 
-Luego, desde la base de datos en la terminal hay que correr `CREATE EXTENSION postgis;`
-Para poder usarla.
+El script `04_analytical_attributes_creation.sql` crea la extensión PostGIS y agrega una columna de geometría (`geom`) a la tabla `normalization.accidente` a partir de las coordenadas de latitud y longitud. Esto permite realizar análisis espacial sobre los puntos de incidentes.
 
-Después, desde la terminal hay que correr `shp2pgsql -s 4326 -I data/colonias_iecm.shp clean.colonia_geometria | psql -d vialcdmx`
+La georreferenciación se realiza en la etapa de análisis (y no en limpieza o normalización) porque es un atributo adicional que enriquece los datos para su análisis, no una corrección ni una descomposición estructural.
+Previo a la ejecución del script, se debe cargar el shapefile de colonias para poder realizar cruces espaciales (mapas coropléticos). Desde la terminal hay que correr:
 
-Aquí, 4326 es el sistema de coordenadas.
-Este comando crea una tabla nueva clean.colonia_geometria con los datos del shapefile en data.
+```{bash}
+shp2pgsql -s 4326 -I data/colonias_iecm.shp clean.colonia_geometria | psql -d vialcdmx
+```
+
+Aquí, 4326 es el sistema de coordenadas. Este comando crea una tabla nueva `clean.colonia_geometria` con los datos del shapefile en data.
+
+
+Para ejecutar el script de atributos analíticos:
+```{psql}
+\i pipeline_scripts/04_analytical_attributes_creation.sql
+```
+

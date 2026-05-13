@@ -1,3 +1,18 @@
+-- 04: Atributos analíticos y georreferenciación
+-- Requiere la extensión PostGIS.
+
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+-- Agregar columna de geometría a la tabla de accidentes
+ALTER TABLE normalization.accidente
+ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);
+
+UPDATE normalization.accidente
+SET geom = ST_Point(longitud, latitud, 4326)
+WHERE geom IS NULL
+  AND longitud IS NOT NULL
+  AND latitud IS NOT NULL;
+
 -- Puntos críticos con alta incidencia de accidentes
 SELECT
     nac.latitud,
@@ -41,11 +56,11 @@ SELECT
     al.nombre AS alcaldia,
     cv.nombre AS clasificacion_vialidad,
     ti.nombre AS tipo_interseccion,
-    ise.nombre AS interseccion_semaforizada,
+    isem.nombre AS interseccion_semaforizada,
     COUNT(*) AS total_accidentes
 FROM normalization.accidente AS nac
 LEFT JOIN normalization.colonia AS col
-    ON nac.colonia_id = col.id 
+    ON nac.colonia_id = col.id
 LEFT JOIN normalization.alcaldia AS al
     ON col.alcaldia_id = al.id
 LEFT JOIN normalization.clasificacion_vialidad AS cv
@@ -53,8 +68,8 @@ LEFT JOIN normalization.clasificacion_vialidad AS cv
 LEFT JOIN normalization.tipo_interseccion AS ti
     ON nac.tipo_interseccion_id = ti.id
 LEFT JOIN normalization.interseccion_semaforizada AS isem
-    ON nac.interseccion_semaforizada_id = ise.id
-GROUP BY al.nombre, cv.nombre, ti.nombre, ise.nombre
+    ON nac.interseccion_semaforizada_id = isem.id
+GROUP BY al.nombre, cv.nombre, ti.nombre, isem.nombre
 ORDER BY al.nombre, total_accidentes DESC;
 
 -- Tipos de accidente más frecuentes
@@ -69,14 +84,14 @@ ORDER BY total_accidentes DESC;
 
 -- Relación entre intersecciones semaforizadas y accidentes
 SELECT
-    ise.nombre AS interseccion_semaforizada,
+    isem.nombre AS interseccion_semaforizada,
     COUNT(*) AS total_accidentes,
     SUM(nac.personas_lesionadas) AS total_lesionados,
     SUM(nac.personas_fallecidas) AS total_fallecidos
 FROM normalization.accidente AS nac
-LEFT JOIN normalization.interseccion_semaforizada AS ise
-    ON nac.interseccion_semaforizada_id = ise.id
-GROUP BY ise.nombre
+LEFT JOIN normalization.interseccion_semaforizada AS isem
+    ON nac.interseccion_semaforizada_id = isem.id
+GROUP BY isem.nombre
 ORDER BY total_accidentes DESC;
 
 -- Clasificación de vialidad con mayor riesgo
@@ -137,7 +152,7 @@ WHERE nac.fecha_evento IS NOT NULL
 GROUP BY dia_semana
 ORDER BY total_accidentes DESC;
 
---Mayor y menor tiempo entre accidente y captura
+-- Mayor y menor tiempo entre accidente y captura
 WITH tiempos_captura AS (
     SELECT AGE(fecha_captura, fecha_evento) AS tiempo_hasta_captura
     FROM normalization.accidente
@@ -159,3 +174,22 @@ SELECT AVG(tiempos_captura.tiempo_hasta_captura),
 'Promedio'
 FROM tiempos_captura
 ;
+
+
+--
+--Ignorar por ahora
+-- UPDATE clean.datos_transitocdmx
+-- SET colonia = c.nomdt
+-- FROM clean.colonia_geometria AS c
+-- WHERE ST_Within(clean.datos_transitocdmx.geom, c.geom);
+--
+-- WITH  geometrias AS (
+--     SELECT geom
+--     FROM clean.colonia_geometria
+-- )
+-- SELECT *
+-- FROM clean.datos_transitocdmx
+-- WHERE NOT ST_Within(clean.datos_transitocdmx.geom, geometrias.geom);
+--
+-- SELECT DISTINCT colonia
+-- FROM clean.datos_transitocdmx;
