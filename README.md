@@ -365,42 +365,73 @@ title: vialcdmx
 ---
 
 erDiagram
-    reporte || -- || accidente : " "
     alcaldia ||--|{ colonia : " "
-    colonia ||--o{ accidente : " "
+    colonia ||--|{ accidente : " "
+    tipo_evento ||--|{ accidente : " "
+    origen ||--o{ accidente : " "
+    sector ||--o{ accidente : " "
+    tipo_interseccion ||--o{ accidente : " "
+    clasificacion_vialidad ||--o{ accidente : " "
+    sentido_circulacion ||--o{ accidente : " "
+    interseccion_semaforizada ||--o{ accidente : " "
 
-    accidente {
-        bigint id PK
-        varchar(32) tipo
-        timestamp fecha
-        smallint no_lesionados
-        smallint no_fallecidos
-        float latitud
-        float longitud
-        varchar(16) clasificacion
-        varchar(16) tipo_interseccion
-        varchar(16) sentido_circulacióm
-        bool interseccion_semaforizada
-        bigint colonia_id FK
-        bigint reporte_id FK
-    }
     alcaldia {
-        bigint id PK
-        varchar(32) nombre
+        bigserial id PK
+        varchar nombre
     }
     colonia {
-        bigint id PK
-        varchar(32) colonia
+        bigserial id PK
+        varchar nombre
         bigint alcaldia_id FK
     }
-    reporte {
-        bigint id PK
-        timestamp fecha
-        varchar(32) origen
-        varchar(32) sector
-        varchar(5) prioridad
+    tipo_evento {
+        bigserial id PK
+        varchar nombre
     }
-
+    origen {
+        bigserial id PK
+        varchar nombre
+    }
+    sector {
+        bigserial id PK
+        varchar nombre
+    }
+    tipo_interseccion {
+        bigserial id PK
+        varchar nombre
+    }
+    clasificacion_vialidad {
+        bigserial id PK
+        varchar nombre
+    }
+    sentido_circulacion {
+        bigserial id PK
+        varchar nombre
+    }
+    interseccion_semaforizada {
+        bigserial id PK
+        varchar nombre
+    }
+    accidente {
+        bigserial id PK
+        numeric latitud
+        numeric longitud
+        date fecha_evento
+        time hora_evento
+        date fecha_captura
+        integer personas_fallecidas
+        integer personas_lesionadas
+        varchar prioridad
+        varchar trasladado_lesionados
+        bigint colonia_id FK
+        bigint tipo_evento_id FK
+        bigint origen_id FK
+        bigint sector_id FK
+        bigint tipo_interseccion_id FK
+        bigint clasificacion_vialidad_id FK
+        bigint sentido_circulacion_id FK
+        bigint interseccion_semaforizada_id FK
+    }
 ```
 > Para facilitar la visualización de este diagrama en el README, se utilizó Mermaid al ser la única opción disponible para este propósito. Sin embargo, esta plataforma no permite ajustar el origen y destino (de qué atributo sale y a cuál llega) de las cardinalidades.
 
