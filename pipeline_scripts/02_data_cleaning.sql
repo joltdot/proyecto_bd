@@ -271,6 +271,11 @@ WHERE sector = 'SD';
 
 --Se corrigieron únicamente errores ortográficos evidentes en sectores policiales. Categorías raras o de baja frecuencia se conservaron para evitar introducir agrupaciones artificiales o perder info.
 
+-- Eliminamos punto 1 y 2
+ALTER TABLE clean.datos_transitocdmx
+    DROP COLUMN punto_1,
+    DROP COLUMN punto_2;
+
 ALTER TABLE clean.datos_transitocdmx
 ADD COLUMN geom geometry(Point, 4326);
 UPDATE clean.datos_transitocdmx
