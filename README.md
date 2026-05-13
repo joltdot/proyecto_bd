@@ -358,7 +358,7 @@ A continuación se enlistan las dependencias funcionales (DF) y multivaluadas (D
 
 | # | Dependencia | Análisis |
 |---|-------------|------------|
-| 1 | `id → fecha_evento, hora_evento, tipo_evento, fecha_captura, latitud, longitud, colonia, alcaldia, sector, unidad_a_cargo, tipo_de_interseccion, interseccion_semaforizada, clasificacion_de_la_vialidad, sentido_de_circulacion, prioridad, origen, unidad_medica_de_apoyo, trasladado_lesionados, personas_fallecidas, personas_lesionadas` | La llave, al haber sido generada artificialmente, determina todos los atributos del registro. |
+| 1 | `id → E`, donde E es el encabezado | La llave, al haber sido generada artificialmente, determina todos los atributos del registro. |
 | 2 | `colonia → alcaldia` | Una colonia pertenece a exactamente una alcaldía. Por lo que cada vez que se repite una colonia, se repite también la alcaldía, lo cual es redundante. |
 
 **Violación a FNBC:**
