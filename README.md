@@ -486,7 +486,7 @@ Para ejecutar el script de atributos analíticos:
 
 El script 04 contiene tres bloques:
 
-**1. Queries descriptivas** — Análisis de frecuencia y cruces entre dimensiones:
+**1. Queries descriptivas** — Análisis de frecuencia y groupby:
 - Puntos críticos (lat/lon con más accidentes)
 - Distribución por hora, día de la semana, alcaldía
 - Factores de riesgo por alcaldía (vialidad × intersección × semáforo)
@@ -497,14 +497,13 @@ El script 04 contiene tres bloques:
 
 **2. Funciones de ventana:**
 
-| Query | Función | Propósito |
-|-------|---------|-----------|
-| Ranking de alcaldías | `RANK() OVER (ORDER BY ...)` | Ordenar alcaldías por total de accidentes |
-| Acumulado mensual | `SUM() OVER (ORDER BY mes)` | Running total de accidentes por mes |
-| Promedio por alcaldía vs individual | `AVG() OVER (PARTITION BY alcaldia)` | Comparar cada accidente contra el promedio de su alcaldía |
-| Diferencia entre horas | `LAG(col, 1) OVER (ORDER BY hora)` | Calcular cambio de accidentes entre horas consecutivas |
-| Cuartiles de riesgo | `NTILE(4) OVER (ORDER BY ...)` | Clasificar colonias en 4 grupos de riesgo |
-| Ranking por alcaldía | `DENSE_RANK() OVER (PARTITION BY alcaldia ...)` | Ranking de tipos de evento dentro de cada alcaldía |
+
+- Ranking de alcaldías por total de accidentes
+- Acumulado mensual de accidentes por mes 
+- Promedio por alcaldía vs individual (comparación de cada accidente contra el promedio de su alcaldía)
+- Cambio de accidentes entre horas consecutivas 
+- Clasificar colonias en 4 grupos (cuartiles) de riesgo
+- Ranking de tipos de evento dentro de cada alcaldía |
 
 **3. Queries para georreferenciación:**
 - Coordenadas de todos los accidentes (mapa de calor)
@@ -542,7 +541,7 @@ También existe el notebook `05_georeferenced_maps.ipynb` que contiene el mismo 
 
 Cada mapa incluye como comentario en el código la consulta SQL equivalente que genera los datos utilizados.
 
-**Nota:** El script asume una conexión PostgreSQL en `localhost:5432` con base de datos `vialcdmx` y usuario local sin contraseña. Ajustar la variable `ENGINE` en el script según el entorno local.
+**Nota:** El script asume una conexión PostgreSQL en `localhost:5432` con base de datos `vialcdmx` y usuario local sin contraseña. Podría ser necesario ajustar el Engine, pero para que no sea necesario correr el archivo python se sube un cuaderno .ipynb con los dfs creados y gráficas generadas.
 
 ---
 
@@ -552,7 +551,7 @@ Al ejecutar el script 05, se obtuvieron los siguientes resultados:
 
 **Mapa 1 — Densidad de accidentes:** Se graficaron las coordenadas de todos los accidentes con geolocalización disponible. La concentración más alta se observa en el centro de la ciudad (alcaldías Cuauhtémoc, Benito Juárez y Venustiano Carranza).
 
-**Mapa 2 — Tasa de letalidad por colonia:** Se identificaron colonias con tasas de letalidad superiores al promedio, particularmente en la periferia (Tlalpan, Xochimilco, Milpa Alta) donde la infraestructura vial es menos desarrollada.
+**Mapa 2 — Tasa de letalidad por colonia:** Se identificaron colonias con tasas de letalidad superiores al promedio, particularmente en la periferia (Tlalpan, Xochimilco, Milpa Alta) donde la infraestructura vial es menos desarrollada o hay carreteras federales (México-Cuernavaca en gran parte de Tlalpan).
 
 **Mapa 3 — Petición de semaforización (Top 20 intersecciones no semaforizadas):**
 
