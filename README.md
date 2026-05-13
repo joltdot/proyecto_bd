@@ -165,7 +165,6 @@ El script de exploración se encuentra en `exploration_queries/01_data_pre_analy
 
 | Atributo | Mínimo | Máximo | Promedio |
 |----------|--------|--------|----------|
-| zona_vial | 1 | 6 | 2.99 |
 | personas_fallecidas | 0 | 10 | 0.0195 |
 | personas_lesionadas | 0 | 25 | 1.1634 |
 
@@ -247,8 +246,7 @@ No se encontraron valores negativos en personas fallecidas ni lesionadas.
 
 ## Limpieza de datos
 
-El proceso de limpieza sigue una metodología de refresh destructivo, por lo que cada vez que se corra se generará desde
-cero el esquema y las tablas correspondientes. Para ejecutar el proceso de limpieza de datos se debe ejecutar el siguiente 
+El proceso de limpieza sigue una metodología de refresh destructivo, por lo que cada vez que se corra se generará desde cero el esquema y las tablas correspondientes. Para ejecutar el proceso de limpieza de datos se debe ejecutar el siguiente 
 comando en `psql`:
 
 ```{psql}
@@ -261,7 +259,7 @@ comando en `psql`:
 | `fecha_evento`, `fecha_captura` | `UPDATE` | Se detectaron 9,221 registros donde `fecha_captura < fecha_evento`, lo cual es lógicamente imposible (no se puede capturar un evento antes de que ocurra). El patrón (no hay ninguna ocurrencia donde día sea mayor a 12) sugiere intercambiar día/mes en el parseo original. | Se corrigió la inversión día/mes, se arregló el año incorrecto en un subconjunto de tuplas y se intercambiaron las fechas en los casos donde ambas estaban invertidas. |
 | `dia`  | `DROP COLUMN`  | El día de la semana ya está implícito en `fecha_evento`. Mantenerlo introduce redundancia y riesgo de inconsistencia. | Si llega a ser necesario se extraerá de `fecha_evento`. |
 |`punto_1`, `punto_2` | `DROP COLUMN`| Hay 18866 valores únicos de mala calidad. La información que tenemos de `latitud` y `origen` es suficiente. | |
-| `tipo_de_interseccion` | `UPDATE`, `RENAME COLUMN` | Se encontraron valores inconsistentes: "AJUSCO" (verificado en Maps como intersección tipo T) y "CRUZO" (typo de "CRUZ"), se renombró a `intersección` para facilidad de manipulación. | Se corrigieron los valores erróneos a sus equivalentes correctos.|
+| `tipo_de_interseccion` | `UPDATE`, `RENAME COLUMN` | Se encontraron valores inconsistentes: "AJUSCO" (verificado en Maps como intersección tipo T) y "CRUZO" (tipo de "CRUZ"), se renombró a `intersección` para facilidad de manipulación. | Se corrigieron los valores erróneos a sus equivalentes correctos.|
 | `clasificacion_de_la_vialidad` | `UPDATE`, `RENAME COLUMN` | Existía duplicación por diferencia de espaciado: "EJEVIAL" vs "EJE VIAL", se renombró a `vialidad` para facilidad de manipulación.  | Se homologó a "EJE VIAL". |
 | `interseccion_semaforizada` | `UPDATE` | Existían valores "N" que debían ser "NO" para mantener consistencia con el dominio SI/NO del atributo. | Se homologó "N" a "NO". |
 | `sentido_de_circulacion` | `UPDATE` |  Se encontraron typos ("P O" en vez de "P-O") y valores ambiguos ("N", "NO", "PO") que no representan sentidos cardinales válidos. | Corrección de escritura y nullificación de valores ambiguos. |
@@ -363,25 +361,9 @@ A continuación se enlistan las dependencias funcionales (DF) y multivaluadas (D
 | 1 | `id → fecha_evento, hora_evento, tipo_evento, fecha_captura, latitud, longitud, colonia, alcaldia, sector, unidad_a_cargo, tipo_de_interseccion, interseccion_semaforizada, clasificacion_de_la_vialidad, sentido_de_circulacion, prioridad, origen, unidad_medica_de_apoyo, trasladado_lesionados, personas_fallecidas, personas_lesionadas` | La llave, al haber sido generada artificialmente, determina todos los atributos del registro. |
 | 2 | `colonia → alcaldia` | Una colonia pertenece a exactamente una alcaldía. Por lo que cada vez que se repite una colonia, se repite también la alcaldía, lo cual es redundante. |
 
-**Dependencias multivaluadas no triviales:**
-
-| # | Dependencia | Análisis |
-|---|-------------|------------|
-| 3 | `id ↠ tipo_evento` | Un incidente tiene un único tipo de evento, pero el tipo de evento es independiente de los atributos de espacio y tiempo. |
-| 4 | `id ↠ origen` | El canal por el que se reporta un incidente es independiente de las características del evento (ubicación, tipo, severidad). |
-| 5 | `id ↠ sector` | El sector policial que atiende es independiente de las características del accidente en sí. Depende de los sectores policiales que no están delimitados por demarcaciones convencionales. |
-| 6 | `id ↠ tipo_interseccion` | La geometría de la intersección (cruz, T, glorieta) es una característica del sitio físico, independiente de las circunstancias (tiempo, lugar, atención) del incidente. |
-| 7 | `id ↠ clasificacion_vialidad` | El tipo de vialidad (primaria, secundaria, eje vial) describe infraestructura fija, independiente de los atributos del evento. |
-| 8 | `id ↠ sentido_circulacion` | El sentido cardinal de la vialidad es propiedad de la infraestructura, independiente de las características del accidente. |
-| 9 | `id ↠ interseccion_semaforizada` | La presencia o ausencia de semáforo es una condición del sitio, independiente de los atributos circunstanciales del incidente. |
-
 **Violación a FNBC:**
 
 - La DF #2 (`colonia → alcaldia`) viola FNBC porque `colonia` no es superllave de la relación. Esto justifica la descomposición en las tablas `alcaldia` y `colonia` (con `alcaldia_id` como FK en `colonia`).
-
-**Violaciones a 4FN:**
-
-- Las DMVs `id ↠ tipo_evento`, `id ↠ origen`, `id ↠ sector`, `id ↠ tipo_interseccion`, `id ↠ clasificacion_vialidad`, `id ↠ sentido_circulacion` e `id ↠ interseccion_semaforizada` generan redundancia cuando se almacenan en una misma relación junto con los demás atributos. La separación en tablas independientes (`tipo_evento`, `origen`, `sector`, `tipo_interseccion`, `clasificacion_vialidad`, `sentido_circulacion`, `interseccion_semaforizada`) con referencia por FK en `accidente` elimina esta redundancia.
 
 ---
 
@@ -391,7 +373,7 @@ A continuación se enlistan las dependencias funcionales (DF) y multivaluadas (D
 title: vialcdmx
 ---
 
-erDiagram
+ERDiagram
     alcaldia ||--|{ colonia : " "
     colonia ||--|{ accidente : " "
     tipo_evento ||--|{ accidente : " "
