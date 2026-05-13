@@ -365,18 +365,23 @@ title: vialcdmx
 ---
 
 erDiagram
-    ubicacion ||--|{ accidente : " "
     reporte || -- || accidente : " "
     alcaldia ||--|{ colonia : " "
-    colonia ||--o{ ubicacion : " "
-    vialidad ||--o{ ubicacion : " "
+    colonia ||--o{ accidente : " "
+
     accidente {
         bigint id PK
         varchar(32) tipo
         timestamp fecha
         smallint no_lesionados
         smallint no_fallecidos
-        bigint ubicacion_id FK 
+        float latitud
+        float longitud
+        varchar(16) clasificacion
+        varchar(16) tipo_interseccion
+        varchar(16) sentido_circulacióm
+        bool interseccion_semaforizada
+        bigint colonia_id FK
         bigint reporte_id FK
     }
     alcaldia {
@@ -387,22 +392,6 @@ erDiagram
         bigint id PK
         varchar(32) colonia
         bigint alcaldia_id FK
-    }
-
-    vialidad {
-        bigint id PK
-        varchar(16) clasificacion
-        varchar(16) tipo_interseccion
-        varchar(16) sentido_circulacióm
-        bool interseccion_semaforizada
-        bigint interseccion_id FK 
-    }
-    ubicacion {
-        bigint id PK
-        float latitud
-        float longitud
-        bigint colonia_id FK 
-        bigint vialidad_id FK 
     }
     reporte {
         bigint id PK
