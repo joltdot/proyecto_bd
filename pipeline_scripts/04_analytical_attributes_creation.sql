@@ -136,3 +136,26 @@ FROM normalization.accidente AS nac
 WHERE nac.fecha_evento IS NOT NULL
 GROUP BY dia_semana
 ORDER BY total_accidentes DESC;
+
+--Mayor y menor tiempo entre accidente y captura
+WITH tiempos_captura AS (
+    SELECT AGE(fecha_captura, fecha_evento) AS tiempo_hasta_captura
+    FROM normalization.accidente
+)
+
+SELECT MAX(tiempos_captura.tiempo_hasta_captura),
+       'Maximo' AS tiempo_hasta_captura
+FROM tiempos_captura
+
+UNION
+
+SELECT MIN(tiempos_captura.tiempo_hasta_captura),
+       'Minimo'
+FROM tiempos_captura
+
+UNION
+
+SELECT AVG(tiempos_captura.tiempo_hasta_captura),
+'Promedio'
+FROM tiempos_captura
+;
