@@ -192,7 +192,7 @@ WHERE al.nombre IS NOT NULL
 GROUP BY al.nombre;
 
 
--- Accidentes acumulados por mes (running total)
+/* -- Accidentes acumulados por mes
 SELECT
     TO_CHAR(fecha_evento, 'YYYY-MM') AS mes,
     COUNT(*) AS accidentes_mes,
@@ -200,10 +200,10 @@ SELECT
 FROM normalization.accidente
 WHERE fecha_evento IS NOT NULL
 GROUP BY TO_CHAR(fecha_evento, 'YYYY-MM')
-ORDER BY mes;
+ORDER BY mes; */
 
 
--- Promedio de lesionados por alcaldía vs valor real de cada accidente
+-- Promedio de lesionados por alcaldía vs gravedad (lesionados) de accidente
 SELECT
     nac.id,
     al.nombre AS alcaldia,
