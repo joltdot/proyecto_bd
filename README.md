@@ -366,9 +366,13 @@ A continuación se enlistan las dependencias funcionales (DF) y multivaluadas (D
 
 | # | Dependencia | Análisis |
 |---|-------------|------------|
-| 3 | `id ↠ tipo_evento` | Un incidente tiene un único tipo de evento, pero el tipo de evento es independiente de los atributos de espacio y tiempo.  |
+| 3 | `id ↠ tipo_evento` | Un incidente tiene un único tipo de evento, pero el tipo de evento es independiente de los atributos de espacio y tiempo. |
 | 4 | `id ↠ origen` | El canal por el que se reporta un incidente es independiente de las características del evento (ubicación, tipo, severidad). |
 | 5 | `id ↠ sector` | El sector policial que atiende es independiente de las características del accidente en sí. Depende de los sectores policiales que no están delimitados por demarcaciones convencionales. |
+| 6 | `id ↠ tipo_interseccion` | La geometría de la intersección (cruz, T, glorieta) es una característica del sitio físico, independiente de las circunstancias (tiempo, lugar, atención) del incidente. |
+| 7 | `id ↠ clasificacion_vialidad` | El tipo de vialidad (primaria, secundaria, eje vial) describe infraestructura fija, independiente de los atributos del evento. |
+| 8 | `id ↠ sentido_circulacion` | El sentido cardinal de la vialidad es propiedad de la infraestructura, independiente de las características del accidente. |
+| 9 | `id ↠ interseccion_semaforizada` | La presencia o ausencia de semáforo es una condición del sitio, independiente de los atributos circunstanciales del incidente. |
 
 **Violación a FNBC:**
 
@@ -376,7 +380,7 @@ A continuación se enlistan las dependencias funcionales (DF) y multivaluadas (D
 
 **Violaciones a 4FN:**
 
-- Las DMVs `id ↠ tipo_evento`, `id ↠ origen` y `id ↠ sector` generan redundancia cuando se almacenan en una misma relación junto con los demás atributos. La separación en tablas `tipo_evento`, `origen`, `sector` con referencia por FK en `accidente` elimina esta redundancia.
+- Las DMVs `id ↠ tipo_evento`, `id ↠ origen`, `id ↠ sector`, `id ↠ tipo_interseccion`, `id ↠ clasificacion_vialidad`, `id ↠ sentido_circulacion` e `id ↠ interseccion_semaforizada` generan redundancia cuando se almacenan en una misma relación junto con los demás atributos. La separación en tablas independientes (`tipo_evento`, `origen`, `sector`, `tipo_interseccion`, `clasificacion_vialidad`, `sentido_circulacion`, `interseccion_semaforizada`) con referencia por FK en `accidente` elimina esta redundancia.
 
 ---
 
