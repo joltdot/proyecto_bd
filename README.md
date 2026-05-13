@@ -377,40 +377,40 @@ erDiagram
 
     alcaldia {
         bigserial id PK
-        varchar nombre
+        varchar(80) nombre
     }
     colonia {
         bigserial id PK
-        varchar nombre
+        varchar(120) nombre
         bigint alcaldia_id FK
     }
     tipo_evento {
         bigserial id PK
-        varchar nombre
+        varchar(50) nombre
     }
     origen {
         bigserial id PK
-        varchar nombre
+        varchar(50) nombre
     }
     sector {
         bigserial id PK
-        varchar nombre
+        varchar(80) nombre
     }
     tipo_interseccion {
         bigserial id PK
-        varchar nombre
+        varchar(50) nombre
     }
     clasificacion_vialidad {
         bigserial id PK
-        varchar nombre
+        varchar(80) nombre
     }
     sentido_circulacion {
         bigserial id PK
-        varchar nombre
+        varchar(30) nombre
     }
     interseccion_semaforizada {
         bigserial id PK
-        varchar nombre
+        varchar(5) nombre
     }
     accidente {
         bigserial id PK
@@ -421,8 +421,8 @@ erDiagram
         date fecha_captura
         integer personas_fallecidas
         integer personas_lesionadas
-        varchar prioridad
-        varchar trasladado_lesionados
+        varchar(20) prioridad
+        varchar(5) trasladado_lesionados
         bigint colonia_id FK
         bigint tipo_evento_id FK
         bigint origen_id FK
