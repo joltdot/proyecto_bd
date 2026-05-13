@@ -380,14 +380,7 @@ En este diseño las llaves foráneas están en las flechas y no en la caja de ca
 El script `04_analytical_attributes_creation.sql` crea la extensión PostGIS y agrega una columna de geometría (`geom`) a la tabla `normalization.accidente` a partir de las coordenadas de latitud y longitud. Esto permite realizar análisis espacial sobre los puntos de incidentes.
 
 La georreferenciación se realiza en la etapa de análisis (y no en limpieza o normalización) porque es un atributo adicional que enriquece los datos para su análisis, no una corrección ni una descomposición estructural.
-Previo a la ejecución del script, se debe cargar el shapefile de colonias para poder realizar cruces espaciales (mapas coropléticos). Desde la terminal hay que correr:
-
-```{bash}
-shp2pgsql -s 4326 -I data/colonias_iecm.shp clean.colonia_geometria | psql -d vialcdmx
-```
-
-Aquí, 4326 es el sistema de coordenadas. Este comando crea una tabla nueva `clean.colonia_geometria` con los datos del shapefile en data.
-
+Previo a la ejecución del script, se debe cargar el shapefile de colonias para poder realizar cruces espaciales (mapas coropléticos). 
 
 Para ejecutar el script de atributos analíticos:
 ```{psql}
