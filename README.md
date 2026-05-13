@@ -368,81 +368,10 @@ A continuación se enlistan las dependencias funcionales (DF) y multivaluadas (D
 ---
 
 ## ERD
-```mermaid
----
-title: vialcdmx
----
 
-ERDiagram
-    alcaldia ||--|{ colonia : " "
-    colonia ||--|{ accidente : " "
-    tipo_evento ||--|{ accidente : " "
-    origen ||--o{ accidente : " "
-    sector ||--o{ accidente : " "
-    tipo_interseccion ||--o{ accidente : " "
-    clasificacion_vialidad ||--o{ accidente : " "
-    sentido_circulacion ||--o{ accidente : " "
-    interseccion_semaforizada ||--o{ accidente : " "
 
-    alcaldia {
-        bigserial id PK
-        varchar(80) nombre
-    }
-    colonia {
-        bigserial id PK
-        varchar(120) nombre
-        bigint alcaldia_id FK
-    }
-    tipo_evento {
-        bigserial id PK
-        varchar(50) nombre
-    }
-    origen {
-        bigserial id PK
-        varchar(50) nombre
-    }
-    sector {
-        bigserial id PK
-        varchar(80) nombre
-    }
-    tipo_interseccion {
-        bigserial id PK
-        varchar(50) nombre
-    }
-    clasificacion_vialidad {
-        bigserial id PK
-        varchar(80) nombre
-    }
-    sentido_circulacion {
-        bigserial id PK
-        varchar(30) nombre
-    }
-    interseccion_semaforizada {
-        bigserial id PK
-        varchar(5) nombre
-    }
-    accidente {
-        bigserial id PK
-        numeric latitud
-        numeric longitud
-        date fecha_evento
-        time hora_evento
-        date fecha_captura
-        integer personas_fallecidas
-        integer personas_lesionadas
-        varchar(20) prioridad
-        varchar(5) trasladado_lesionados
-        bigint colonia_id FK
-        bigint tipo_evento_id FK
-        bigint origen_id FK
-        bigint sector_id FK
-        bigint tipo_interseccion_id FK
-        bigint clasificacion_vialidad_id FK
-        bigint sentido_circulacion_id FK
-        bigint interseccion_semaforizada_id FK
-    }
-```
-> Para facilitar la visualización de este diagrama en el README, se utilizó Mermaid al ser la única opción disponible para este propósito. Sin embargo, esta plataforma no permite ajustar el origen y destino (de qué atributo sale y a cuál llega) de las cardinalidades.
+![ERD](data/ERDnormalizado.png)
+En este diseño las llaves foráneas están en las flechas y no en la caja de cada tabla, pero forman parte de las tabla.
 
 ---
 ## Georreferenciación (parte E)
