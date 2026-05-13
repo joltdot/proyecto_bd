@@ -398,3 +398,12 @@ WHERE isem.nombre = 'no'
 GROUP BY nac.latitud, nac.longitud, col.nombre, al.nombre, ti.nombre
 ORDER BY total_accidentes DESC
 LIMIT 20;
+
+
+--Letalidad por año
+
+SELECT EXTRACT('YEAR' FROM fecha_evento) AS anio,
+       SUM(personas_fallecidas) AS total_personas_fallecidas
+FROM normalization.accidente
+GROUP BY  EXTRACT('YEAR' FROM fecha_evento)
+ORDER BY total_personas_fallecidas DESC;
