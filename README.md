@@ -376,7 +376,7 @@ A continuación se enlistan las dependencias funcionales (DF) y multivaluadas (D
 
 **Violaciones a 4FN:**
 
-- Las DMVs #3, #4 y #5 generan redundancia cuando se almacenan en una misma relación junto con los demás atributos. La separación en tablas `tipo_evento`, `origen`, `sector` con referencia por FK en `accidente` elimina esta redundancia.
+- Las DMVs `id ↠ tipo_evento`, `id ↠ origen` y `id ↠ sector` generan redundancia cuando se almacenan en una misma relación junto con los demás atributos. La separación en tablas `tipo_evento`, `origen`, `sector` con referencia por FK en `accidente` elimina esta redundancia.
 
 ---
 
