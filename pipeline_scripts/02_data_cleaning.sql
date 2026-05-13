@@ -271,6 +271,16 @@ WHERE sector = 'SD';
 
 --Se corrigieron únicamente errores ortográficos evidentes en sectores policiales. Categorías raras o de baja frecuencia se conservaron para evitar introducir agrupaciones artificiales o perder info.
 
+-- Coordenadas outlier: 5 registros con longitud positiva (fuera de CDMX)
+-- 2 tienen el signo invertido (99.x debería ser -99.x), 3 tienen latitud duplicada en longitud
+UPDATE clean.datos_transitocdmx
+SET longitud = -longitud
+WHERE longitud > 0 AND longitud BETWEEN 99 AND 100;
+
+UPDATE clean.datos_transitocdmx
+SET longitud = NULL, latitud = NULL
+WHERE longitud > 0;
+
 -- Eliminamos punto 1 y 2
 ALTER TABLE clean.datos_transitocdmx
     DROP COLUMN punto_1,
