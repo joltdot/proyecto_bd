@@ -109,7 +109,7 @@ ORDER BY total_lesionados DESC;
 -- Intersecciones más peligrosas por número de fallecidos
 SELECT
     ti.nombre AS tipo_interseccion,
-    ise.nombre AS interseccion_semaforizada,
+    isem.nombre AS interseccion_semaforizada,
     cv.nombre AS clasificacion_vialidad,
     al.nombre AS alcaldia,
     SUM(nac.personas_fallecidas) AS total_fallecidos,
@@ -117,8 +117,8 @@ SELECT
 FROM normalization.accidente AS nac
 LEFT JOIN normalization.tipo_interseccion AS ti
     ON nac.tipo_interseccion_id = ti.id
-LEFT JOIN normalization.interseccion_semaforizada AS ise
-    ON nac.interseccion_semaforizada_id = ise.id
+LEFT JOIN normalization.interseccion_semaforizada AS isem
+    ON nac.interseccion_semaforizada_id = isem.id
 LEFT JOIN normalization.clasificacion_vialidad AS cv
     ON nac.clasificacion_vialidad_id = cv.id
 LEFT JOIN normalization.colonia AS col
