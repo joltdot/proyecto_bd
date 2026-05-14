@@ -113,8 +113,8 @@ UPDATE clean.datos_transitocdmx
 UPDATE clean.datos_transitocdmx
 SET fecha_captura =  make_date(
     EXTRACT(YEAR FROM fecha_captura)::int,
-    EXTRACT(DAY FROM fecha_captura)::int, -- Day becomes Month
-    EXTRACT(MONTH FROM fecha_captura)::int -- Month becomes Day
+    EXTRACT(DAY FROM fecha_captura)::int,
+    EXTRACT(MONTH FROM fecha_captura)::int 
 )
 WHERE fecha_captura<fecha_evento
 AND NOT extract(DAY FROM fecha_captura) >12;
