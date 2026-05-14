@@ -478,12 +478,13 @@ Al ejecutar el script 05, se obtuvieron los siguientes resultados:
 
 Tlalpan concentra 5 de las 20 intersecciones más peligrosas sin semáforo.
 
-**Mapa 4 — Tiempo de respuesta:** Se observa variabilidad en el tiempo promedio entre la ocurrencia del accidente y su captura en el sistema, con colonias periféricas tendiendo a tiempos mayores.
 
-**Mapa 5 — Día vs Noche:**
+**Mapa 4 — Día vs Noche:**
 - Accidentes diurnos (7:00–18:59): 80,789
 - Accidentes nocturnos (19:00–6:59): 48,270
 - El 37% de los accidentes ocurren de noche, con las intersecciones nocturnas sin semáforo más peligrosas ubicadas en San Pedro Mártir (Tlalpan, 8 acc.), Ajusco (Coyoacán, 6 acc.) y Agrícola Pantitlán (Iztacalco, 6 acc.).
+
+**Mapa 5 — Tiempo de respuesta:** Se observa variabilidad en el tiempo promedio entre la ocurrencia del accidente y su captura en el sistema, con colonias periféricas tendiendo a tiempos mayores.
 
 # Conclusiones 
  1. La Carretera Federal México-Cuernavaca domina las intersecciones sin semáforo más peligrosas, 7 de las 20 peores están ahí. semaforización.                                               
