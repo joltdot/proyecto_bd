@@ -380,7 +380,14 @@ En este diseño las llaves foráneas están en las flechas y no en la caja de ca
 El script `04_analytical_attributes_creation.sql` crea la extensión PostGIS y agrega una columna de geometría (`geom`) a la tabla `normalization.accidente` a partir de las coordenadas de latitud y longitud. Esto permite realizar análisis espacial sobre los puntos de incidentes.
 
 La georreferenciación se realiza en la etapa de análisis (y no en limpieza o normalización) porque es un atributo adicional que enriquece los datos para su análisis, no una corrección ni una descomposición estructural.
-Previo a la ejecución del script, se debe cargar el shapefile de colonias para poder realizar cruces espaciales (mapas coropléticos). 
+Previo a la ejecución del script, se debe cargar el shapefile de colonias para poder realizar cruces espaciales (mapas coropléticos). Desde la terminal hay que correr:
+
+```{bash}
+shp2pgsql -s 4326 -I data/colonias_iecm.shp clean.colonia_geometria | psql -d vialcdmx
+```
+
+Aquí, 4326 es el sistema de coordenadas. Este comando crea una tabla nueva `clean.colonia_geometria` con los datos del shapefile en data.
+
 
 Para ejecutar el script de atributos analíticos:
 ```{psql}
@@ -478,3 +485,9 @@ Tlalpan concentra 5 de las 20 intersecciones más peligrosas sin semáforo.
 - Accidentes nocturnos (19:00–6:59): 48,270
 - El 37% de los accidentes ocurren de noche, con las intersecciones nocturnas sin semáforo más peligrosas ubicadas en San Pedro Mártir (Tlalpan, 8 acc.), Ajusco (Coyoacán, 6 acc.) y Agrícola Pantitlán (Iztacalco, 6 acc.).
 
+# Conclusiones 
+ 1. La Carretera Federal México-Cuernavaca domina las intersecciones sin semáforo más peligrosas, 7 de las 20 peores están ahí. semaforización.                                               
+ 2. La periferia mata más — las tasas de letalidad más altas están en Tlalpan, Milpa Alta y Tláhuac, donde la infraestructura vial es menor y las velocidades son más altas (carreteras). En el centro hay más choques pero son de menor severidad.                                                                    
+ 3. 37% de los accidentes ocurren de noche con menos tráfico, esto sugiere que velocidad, visibilidad y alcohol son factores más determinantes que el volumen vehicular.
+ 4. Las intersecciones nocturnas sin semáforo son particularmente peligrosas en zonas periféricas: San Pedro Mártir, Ajusco, San Miguel Xicalco. Son zonas donde la iluminación y señalización es deficiente.
+ 5. El tiempo de respuesta (captura) varía significativamente por zona — las colonias del sur y oriente tardan más en ser registradas, lo que podría indicar menor cobertura operativa.
