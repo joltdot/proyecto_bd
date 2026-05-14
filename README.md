@@ -486,7 +486,7 @@ Tlalpan concentra 5 de las 20 intersecciones más peligrosas sin semáforo.
 - El 37% de los accidentes ocurren de noche, con las intersecciones nocturnas sin semáforo más peligrosas ubicadas en San Pedro Mártir (Tlalpan, 8 acc.), Ajusco (Coyoacán, 6 acc.) y Agrícola Pantitlán (Iztacalco, 6 acc.).
 
 # Conclusiones 
- 1. La Carretera Federal México-Cuernavaca domina las intersecciones sin semáforo más peligrosas, 7 de las 20 peores están ahí. semaforización.                                               
+ 1. La Carretera Federal México-Cuernavaca domina las intersecciones sin semáforo más peligrosas, 7 de las 20 peores están ahí. Sería conveniente colocar algúnos semáforos en zonas estratégicas para reducir la velocidad o mejorar la atención del conductor previo a una zona de peligro.                                             
  2. La periferia mata más — las tasas de letalidad más altas están en Tlalpan, Milpa Alta y Tláhuac, donde la infraestructura vial es menor y las velocidades son más altas (carreteras). En el centro hay más choques pero son de menor severidad.                                                                    
  3. 37% de los accidentes ocurren de noche con menos tráfico, esto sugiere que velocidad, visibilidad y alcohol son factores más determinantes que el volumen vehicular.
  4. Las intersecciones nocturnas sin semáforo son particularmente peligrosas en zonas periféricas: San Pedro Mártir, Ajusco, San Miguel Xicalco. Son zonas donde la iluminación y señalización es deficiente.
